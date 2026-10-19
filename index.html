@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Glint</title>
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <linearGradient id="spectrum-stroke" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffd37a" />
+          <stop offset="0.38" stop-color="#ff6aa6" />
+          <stop offset="0.68" stop-color="#8b7bff" />
+          <stop offset="1" stop-color="#46e3ff" />
+        </linearGradient>
+      </defs>
+    </svg>
+    <div id="app" class="app is-empty" data-theme="dark">
+      <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="ambient" aria-hidden="true"><div class="glow"></div><div class="glow"></div></div>
+
+      <main class="stage" id="stage" aria-label="Image">
+        <div class="slide"><div class="kb"><img class="pic" alt="" draggable="false" /></div></div>
+        <div class="slide"><div class="kb"><img class="pic" alt="" draggable="false" /></div></div>
+        <div class="broken" hidden>
+          <div class="broken-icon"></div>
+          <div class="broken-title">This image can't be shown</div>
+          <div class="broken-text"></div>
+        </div>
+      </main>
+
+      <section class="empty" aria-label="Welcome">
+        <div class="mark"><img src="/assets/logo.svg" alt="" width="128" height="128" /></div>
+        <h1 class="wordmark">Glint</h1>
+        <p class="tagline">Every image. Instantly.</p>
+        <button class="cta" data-action="open"><span>Open images</span><kbd data-key-open></kbd></button>
+        <p class="hint">or drop them anywhere</p>
+        <div class="formats" aria-label="Supported formats"></div>
+        <p class="tip">Tip: select several images and open them together for a slideshow.</p>
+      </section>
+
+      <header class="topbar hud" data-tauri-drag-region>
+        <div class="traffic-space" data-tauri-drag-region></div>
+        <div class="title" data-tauri-drag-region>
+          <span class="name" data-tauri-drag-region></span>
+          <span class="meta" data-tauri-drag-region></span>
+        </div>
+        <button class="update-pill" data-action="update" hidden><span class="update-dot"></span><span class="update-text"></span></button>
+        <div class="tools">
+          <button class="icon-btn" data-action="open" data-tip="Open (O)"></button>
+          <button class="icon-btn" data-action="info" data-tip="Info (I)"></button>
+          <button class="icon-btn" data-action="palette" data-tip="Palette (P)"></button>
+          <button class="icon-btn" data-action="grid" data-tip="Contact sheet (G)"></button>
+          <button class="icon-btn" data-action="ambient" data-tip="Ambient light (A)"></button>
+          <button class="icon-btn" data-action="menu" data-tip="More"></button>
+        </div>
+        <div class="win-controls">
+          <button class="win-btn" data-action="win-min" aria-label="Minimize"></button>
+          <button class="win-btn" data-action="win-max" aria-label="Maximize"></button>
+          <button class="win-btn close" data-action="win-close" aria-label="Close"></button>
+        </div>
+      </header>
+
+      <div class="dock hud">
+        <div class="strip" role="listbox" aria-label="Images"></div>
+        <div class="controls">
+          <button class="icon-btn" data-action="prev" data-tip="Previous (Left)"></button>
+          <button class="play" data-action="play" data-tip="Slideshow (Space)">
+            <svg class="ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" /><circle class="progress" cx="22" cy="22" r="20" /></svg>
+            <span class="play-icon"></span>
+          </button>
+          <button class="icon-btn" data-action="next" data-tip="Next (Right)"></button>
+          <span class="sep"></span>
+          <button class="icon-btn" data-action="zoom-out" data-tip="Zoom out (-)"></button>
+          <button class="zoom-label" data-action="zoom-toggle" data-tip="Fit / 100% (0 / 1)">100%</button>
+          <button class="icon-btn" data-action="zoom-in" data-tip="Zoom in (+)"></button>
+          <span class="sep"></span>
+          <button class="icon-btn" data-action="rotate" data-tip="Rotate (R)"></button>
+          <button class="icon-btn" data-action="flip" data-tip="Mirror (F)"></button>
+          <button class="icon-btn" data-action="backdrop" data-tip="Backdrop (B)"></button>
+          <button class="icon-btn" data-action="loupe" data-tip="Pixel loupe (L, hold Alt)"></button>
+          <span class="sep"></span>
+          <button class="icon-btn" data-action="fullscreen" data-tip="Fullscreen (Enter)"></button>
+        </div>
+      </div>
+
+      <aside class="info-panel panel" aria-label="Image info"></aside>
+      <div class="palette-panel panel" aria-label="Palette"></div>
+      <section class="sheet" aria-label="Contact sheet"><div class="sheet-head"><span class="sheet-title"></span><button class="icon-btn" data-action="grid" aria-label="Close"></button></div><div class="sheet-grid"></div></section>
+      <canvas class="loupe" width="176" height="176" aria-hidden="true"></canvas>
+      <div class="loupe-label" aria-hidden="true"></div>
+      <div class="drop-zone" aria-hidden="true"><div class="drop-card"><div class="drop-glyph"></div>Drop to view</div></div>
+      <div class="menu" role="menu"></div>
+      <div class="modal-layer"></div>
+      <div class="toasts" aria-live="polite"></div>
+      <div class="tooltip" role="tooltip"></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,85 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Glint",
+  "version": "1.0.0",
+  "identifier": "de.wolfganglinz.glint",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Glint",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 520,
+        "minHeight": 360,
+        "center": true,
+        "decorations": false,
+        "shadow": true,
+        "backgroundColor": "#07080c",
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "img-src": "'self' data: blob: glint: http://glint.localhost",
+        "connect-src": "'self' ipc: http://ipc.localhost glint: http://glint.localhost",
+        "style-src": "'self' 'unsafe-inline'",
+        "script-src": "'self'"
+      },
+      "dangerousDisableAssetCspModification": ["style-src"]
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDZDRTA1RTY4MTBBRkYyODAKUldTQThxOFFhRjdnYlAvSjJCRjdYMWZaZlJ2UVZsMUY2eWpRU0pZK0VOblpFQXFGMWljMG1xQUwK",
+      "endpoints": ["https://github.com/wl-lankin/glint/releases/latest/download/latest.json"],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "createUpdaterArtifacts": true,
+    "targets": ["nsis", "app", "dmg"],
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "resources": {
+      "icons/file-image.ico": "icons/file-image.ico"
+    },
+    "publisher": "Wolfgang Linz",
+    "copyright": "Copyright 2026 Wolfgang Linz",
+    "homepage": "https://wolfgang-linz.de",
+    "category": "Photography",
+    "shortDescription": "Every image. Instantly.",
+    "longDescription": "Glint is a fast, beautiful image viewer for every image format, with an ambient glow, slideshows from any selection, a contact sheet, a color palette and a pixel loupe.",
+    "license": "MIT",
+    "fileAssociations": [
+      {
+        "ext": ["png", "apng", "jpg", "jpeg", "jpe", "jfif", "pjpeg", "pjp", "gif", "webp", "avif", "heic", "heif", "svg", "bmp", "dib", "ico", "cur", "tif", "tiff", "tga", "qoi", "dds", "hdr", "exr", "pbm", "pgm", "ppm", "pnm", "pam", "ff", "jxl", "psd"],
+        "contentTypes": ["public.png", "public.jpeg", "com.compuserve.gif", "org.webmproject.webp", "public.avif", "public.heic", "public.heif", "public.svg-image", "com.microsoft.bmp", "com.microsoft.ico", "public.tiff", "com.truevision.tga-image", "public.radiance", "com.ilm.openexr-image", "public.pbm", "public.jpeg-xl", "com.adobe.photoshop-image"],
+        "name": "Glint.Image",
+        "description": "Image",
+        "role": "Viewer",
+        "rank": "Default"
+      }
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerHooks": "./windows/hooks.nsh",
+        "installerIcon": "icons/icon.ico"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "11.0"
+    }
+  }
+}

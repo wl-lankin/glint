@@ -1,0 +1,83 @@
+name: release
+
+# A tag v<version> builds Glint for Windows (NSIS installer) and macOS (universal .dmg) and
+# publishes them as a GitHub release. The release notes come from docs/releases/<tag>.md.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create.outputs.id }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create the draft release
+        id: create
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          notes="docs/releases/$TAG.md"
+          if [ ! -f "$notes" ]; then echo "::error::$notes is missing"; exit 1; fi
+          version="${TAG#v}"
+          if ! grep -q "\"version\": \"$version\"" package.json src-tauri/tauri.conf.json; then
+            echo "::error::The tag $TAG does not match the version in package.json / tauri.conf.json"; exit 1
+          fi
+          gh release create "$TAG" --draft --title "Glint $TAG" --notes-file "$notes" --verify-tag
+          id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq ".[] | select(.tag_name == \"$TAG\") | .id" | head -1)
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: draft
+    strategy:
+      # One platform at a time: both upload to the same latest.json, which must not race.
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            args: '--bundles nsis'
+            targets: ''
+          - os: macos-latest
+            args: '--target universal-apple-darwin --bundles app,dmg'
+            targets: 'aarch64-apple-darwin,x86_64-apple-darwin'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.targets }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signs the update packages; installed copies of Glint accept only updates signed with this key.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          releaseId: ${{ needs.draft.outputs.release_id }}
+          args: ${{ matrix.args }}
+          # latest.json is the feed the in-app updater reads (releases/latest/download/latest.json).
+          includeUpdaterJson: true
+
+  publish:
+    needs: [draft, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "${{ github.ref_name }}" --repo "$GITHUB_REPOSITORY" --draft=false --latest

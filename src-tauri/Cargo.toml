@@ -1,0 +1,46 @@
+[package]
+name = "glint"
+version = "1.0.0"
+description = "Glint - every image, instantly."
+authors = ["Wolfgang Linz"]
+license = "MIT"
+repository = "https://github.com/wl-lankin/glint"
+edition = "2021"
+
+[lib]
+name = "glint_lib"
+crate-type = ["rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-single-instance = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "ico", "tiff", "tga", "qoi", "dds", "hdr", "exr", "pnm", "ff", "rayon"] }
+jxl-oxide = { version = "0.12", features = ["image"] }
+psd = "0.3"
+kamadak-exif = "0.6"
+natord = "1"
+percent-encoding = "2"
+arboard = { version = "3", default-features = false, features = ["image-data"] }
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+# Image decoders are hot loops; keep them fast in dev builds too.
+[profile.dev.package."*"]
+opt-level = 3

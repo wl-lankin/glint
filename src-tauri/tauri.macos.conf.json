@@ -1,0 +1,21 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Glint",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 520,
+        "minHeight": 360,
+        "center": true,
+        "decorations": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "backgroundColor": "#07080c",
+        "dragDropEnabled": true
+      }
+    ]
+  }
+}

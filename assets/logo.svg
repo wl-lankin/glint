@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1C2140"/>
+      <stop offset="1" stop-color="#07080E"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx="0.3" cy="0.15" r="0.8">
+      <stop offset="0" stop-color="#46508F" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#46508F" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6E6BFF"/>
+      <stop offset="0.45" stop-color="#FF6AA6"/>
+      <stop offset="0.85" stop-color="#FFC56E"/>
+    </linearGradient>
+    <linearGradient id="back" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B4478"/>
+      <stop offset="1" stop-color="#232949"/>
+    </linearGradient>
+    <linearGradient id="far" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7B4E9E"/>
+      <stop offset="1" stop-color="#3A2A66"/>
+    </linearGradient>
+    <linearGradient id="near" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1E2148"/>
+      <stop offset="1" stop-color="#0D0F22"/>
+    </linearGradient>
+    <linearGradient id="glare" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFFBEA"/>
+      <stop offset="0.6" stop-color="#FFE7B0"/>
+      <stop offset="1" stop-color="#FFE7B0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="22"/>
+      <feOffset dy="22"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.55"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <clipPath id="tileclip"><rect x="64" y="64" width="896" height="896" rx="208"/></clipPath>
+    <clipPath id="photo"><rect x="250" y="330" width="524" height="400" rx="30"/></clipPath>
+  </defs>
+
+  <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#tile)"/>
+  <g clip-path="url(#tileclip)">
+    <rect x="64" y="64" width="896" height="896" fill="url(#sheen)"/>
+    <!-- ambient glow the photo throws on the tile -->
+    <ellipse cx="512" cy="560" rx="330" ry="250" fill="#FF6AA6" opacity="0.22" filter="url(#soft)"/>
+
+    <!-- the next photo in the stack -->
+    <g transform="rotate(-9 512 512)" filter="url(#shadow)">
+      <rect x="226" y="286" width="572" height="448" rx="44" fill="url(#back)"/>
+      <rect x="226" y="286" width="572" height="448" rx="44" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="3"/>
+    </g>
+
+    <!-- the photo on top -->
+    <g transform="rotate(3 512 512)" filter="url(#shadow)">
+      <rect x="226" y="306" width="572" height="448" rx="48" fill="#F4F5FA"/>
+      <g clip-path="url(#photo)">
+        <rect x="250" y="330" width="524" height="400" fill="url(#sky)"/>
+        <circle cx="610" cy="520" r="78" fill="url(#sun)"/>
+        <circle cx="610" cy="520" r="44" fill="#FFF8E4"/>
+        <path d="M250 640 L390 500 Q404 486 418 500 L520 598 L600 540 Q614 530 628 540 L774 650 V730 H250 Z" fill="url(#far)"/>
+        <path d="M250 690 L346 606 Q360 594 374 606 L470 684 L560 618 Q574 608 588 618 L774 712 V730 H250 Z" fill="url(#near)"/>
+      </g>
+      <!-- the glint: light catching the glossy print -->
+      <path d="M262 342 L420 342 L262 520 Z" fill="url(#glare)" opacity="0.5" clip-path="url(#photo)"/>
+    </g>
+  </g>
+  <rect x="65" y="65" width="894" height="894" rx="207" fill="none" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="2"/>
+</svg>
