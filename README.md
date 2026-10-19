@@ -39,7 +39,7 @@ These links always point to the newest version. Every release also has the same 
 - **Your default viewer.** The installer registers Glint for every supported type. SVGs open in Glint instead of the browser.
 - **Slideshow from a selection.** Select several images in Explorer or Finder and press Enter: Glint gathers them into one slideshow with gentle Ken Burns motion and a filmstrip. Open a single image and the arrow keys browse its folder.
 - **Ambient light.** The window glows in the colors of the current image, like a TV with ambient lighting.
-- **Contact sheet.** See the whole set as a grid and jump to any image.
+- **Overview.** See all images as a grid and jump to any of them.
 - **Color palette.** The six dominant colors of the image, one click copies the hex code.
 - **Pixel loupe.** Hold Alt (or press L) for a magnifier with a pixel grid and the color under the cursor.
 - **Info and histogram.** Dimensions, file size, dates, an RGB histogram and camera data from EXIF.
@@ -61,7 +61,7 @@ These links always point to the newest version. Every release also has the same 
 | --- | --- |
 | Left / Right | Previous / next image |
 | Space | Play / pause the slideshow |
-| G | Contact sheet |
+| G | Overview of all images |
 | Mouse wheel | Zoom at the cursor |
 | 0 / 1 | Fit to window / actual size |
 | + / - | Zoom in / out |
@@ -80,7 +80,7 @@ These links always point to the newest version. Every release also has the same 
 
 ## Auf Deutsch
 
-Glint ist ein schneller, schöner Bildbetrachter für Windows und macOS. Er öffnet jedes gängige Bildformat (auch SVG, PSD, TIFF, JPEG XL, EXR und HEIC unter macOS), macht aus mehreren markierten Bildern automatisch eine Diashow, lässt SVGs live im Quelltext bearbeiten, taucht jedes Bild in ein Umgebungslicht aus seinen eigenen Farben und bietet Kontaktabzug, Farbpalette, Pixellupe sowie Infos mit Histogramm und EXIF-Daten. Die Oberfläche folgt der Systemsprache (Deutsch oder Englisch), Updates installieren sich von selbst.
+Glint ist ein schneller, schöner Bildbetrachter für Windows und macOS. Er öffnet jedes gängige Bildformat (auch SVG, PSD, TIFF, JPEG XL, EXR und HEIC unter macOS), macht aus mehreren markierten Bildern automatisch eine Diashow, lässt SVGs live im Quelltext bearbeiten, taucht jedes Bild in ein Umgebungslicht aus seinen eigenen Farben und bietet Übersicht aller Bilder, Farbpalette, Pixellupe sowie Infos mit Histogramm und EXIF-Daten. Die Oberfläche folgt der Systemsprache (Deutsch oder Englisch), Updates installieren sich von selbst.
 
 **Installation:** den passenden Download von der [Release-Seite](https://github.com/wl-lankin/glint/releases/latest) holen. **Als Standard festlegen** unter Windows 11: Rechtsklick auf ein Bild > **Öffnen mit** > **Andere App auswählen** > **Glint** > **Immer**. Unter macOS: Bild im Finder markieren > **Informationen** (Cmd+I) > **Öffnen mit: Glint** > **Alle ändern...**
 
@@ -102,7 +102,7 @@ Releases are built by GitHub Actions: bump the version in `package.json`, `src-t
 
 ## How it works
 
-Glint is a [Tauri 2](https://tauri.app) app. The Rust side serves images to the WebView through its own `glint://` protocol: formats the WebView draws itself pass through untouched, all others are decoded in Rust (`image`, `jxl-oxide`, `psd`) and handed over as PNG. Thumbnails for the filmstrip, the contact sheet and the ambient glow are made and cached in Rust too. When Explorer starts one Glint per selected file, the extra processes pass their files to the first one, which collects everything that arrives within a quarter of a second into one slideshow.
+Glint is a [Tauri 2](https://tauri.app) app. The Rust side serves images to the WebView through its own `glint://` protocol: formats the WebView draws itself pass through untouched, all others are decoded in Rust (`image`, `jxl-oxide`, `psd`) and handed over as PNG. Thumbnails for the filmstrip, the overview and the ambient glow are made and cached in Rust too. When Explorer starts one Glint per selected file, the extra processes pass their files to the first one, which collects everything that arrives within a quarter of a second into one slideshow.
 
 ## Credits
 

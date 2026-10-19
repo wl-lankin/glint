@@ -300,7 +300,7 @@ export class Panels {
     this.palette.replaceChildren(...nodes);
   }
 
-  // ---------------------------------------------------------------- contact sheet
+  // ---------------------------------------------------------------- overview of all images
 
   toggleSheet() {
     if (this.app.root.classList.contains('sheet-open')) return this.closeSheet();

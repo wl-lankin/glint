@@ -1,6 +1,6 @@
 [package]
 name = "glint"
-version = "1.2.0"
+version = "1.2.1"
 description = "Glint - every image, instantly."
 authors = ["Wolfgang Linz"]
 license = "MIT"
