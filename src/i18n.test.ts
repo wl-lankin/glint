@@ -33,7 +33,7 @@ describe('dictionaries', () => {
 
   it('never uses long dashes', () => {
     for (const lang of ['en', 'de'] as const) {
-      for (const text of Object.values(dictionaries[lang])) expect(text).not.toMatch(/[–—]/);
+      for (const text of Object.values(dictionaries[lang])) expect(text).not.toMatch(/[\u2013\u2014]/);
     }
   });
 });
