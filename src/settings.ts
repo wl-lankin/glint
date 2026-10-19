@@ -1,4 +1,8 @@
+import type { LanguagePreference } from './i18n';
+
 export interface Settings {
+  /** 'system' follows the system language (German or English). */
+  language: LanguagePreference;
   theme: 'dark' | 'light' | 'system';
   ambient: boolean;
   /** What shows through transparent pixels. 'auto' lets the ambient glow through. */
@@ -11,6 +15,7 @@ export interface Settings {
 }
 
 export const DEFAULTS: Settings = {
+  language: 'system',
   theme: 'dark',
   ambient: true,
   backdrop: 'auto',
@@ -41,6 +46,7 @@ export function saveSettings(settings: Settings) {
 export function sanitize(s: Settings): Settings {
   const pick = <T>(v: T, allowed: readonly T[], fallback: T) => (allowed.includes(v) ? v : fallback);
   return {
+    language: pick(s.language, ['system', 'en', 'de'] as const, DEFAULTS.language),
     theme: pick(s.theme, ['dark', 'light', 'system'] as const, DEFAULTS.theme),
     ambient: typeof s.ambient === 'boolean' ? s.ambient : DEFAULTS.ambient,
     backdrop: pick(s.backdrop, ['auto', 'checker', 'black', 'white'] as const, DEFAULTS.backdrop),

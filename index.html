@@ -22,24 +22,24 @@
       <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
       <div class="ambient" aria-hidden="true"><div class="glow"></div><div class="glow"></div></div>
 
-      <main class="stage" id="stage" aria-label="Image">
+      <main class="stage" id="stage" data-i18n-aria="aria.image">
         <div class="slide"><div class="kb"><img class="pic" alt="" draggable="false" /></div></div>
         <div class="slide"><div class="kb"><img class="pic" alt="" draggable="false" /></div></div>
         <div class="broken" hidden>
           <div class="broken-icon"></div>
-          <div class="broken-title">This image can't be shown</div>
+          <div class="broken-title" data-i18n="broken.title"></div>
           <div class="broken-text"></div>
         </div>
       </main>
 
-      <section class="empty" aria-label="Welcome">
+      <section class="empty" data-i18n-aria="aria.welcome">
         <div class="mark"><img src="/assets/logo.svg" alt="" width="128" height="128" /></div>
         <h1 class="wordmark">Glint</h1>
-        <p class="tagline">Every image. Instantly.</p>
-        <button class="cta" data-action="open"><span>Open images</span><kbd data-key-open></kbd></button>
-        <p class="hint">or drop them anywhere</p>
-        <div class="formats" aria-label="Supported formats"></div>
-        <p class="tip">Tip: select several images and open them together for a slideshow.</p>
+        <p class="tagline" data-i18n="start.tagline"></p>
+        <button class="cta" data-action="open"><span data-i18n="start.open"></span><kbd data-key-open></kbd></button>
+        <p class="hint" data-i18n="start.drop"></p>
+        <div class="formats" data-i18n-aria="start.formats"></div>
+        <p class="tip" data-i18n="start.tip"></p>
       </section>
 
       <header class="topbar hud" data-tauri-drag-region>
@@ -50,49 +50,49 @@
         </div>
         <button class="update-pill" data-action="update" hidden><span class="update-dot"></span><span class="update-text"></span></button>
         <div class="tools">
-          <button class="icon-btn" data-action="open" data-tip="Open (O)"></button>
-          <button class="icon-btn" data-action="info" data-tip="Info (I)"></button>
-          <button class="icon-btn" data-action="palette" data-tip="Palette (P)"></button>
-          <button class="icon-btn" data-action="grid" data-tip="Contact sheet (G)"></button>
-          <button class="icon-btn" data-action="ambient" data-tip="Ambient light (A)"></button>
-          <button class="icon-btn" data-action="menu" data-tip="More"></button>
+          <button class="icon-btn" data-action="open" data-i18n-tip="tip.open"></button>
+          <button class="icon-btn" data-action="info" data-i18n-tip="tip.info"></button>
+          <button class="icon-btn" data-action="palette" data-i18n-tip="tip.palette"></button>
+          <button class="icon-btn" data-action="grid" data-i18n-tip="tip.grid"></button>
+          <button class="icon-btn" data-action="ambient" data-i18n-tip="tip.ambient"></button>
+          <button class="icon-btn" data-action="menu" data-i18n-tip="tip.more"></button>
         </div>
         <div class="win-controls">
-          <button class="win-btn" data-action="win-min" aria-label="Minimize"></button>
-          <button class="win-btn" data-action="win-max" aria-label="Maximize"></button>
-          <button class="win-btn close" data-action="win-close" aria-label="Close"></button>
+          <button class="win-btn" data-action="win-min" data-i18n-aria="win.minimize"></button>
+          <button class="win-btn" data-action="win-max" data-i18n-aria="win.maximize"></button>
+          <button class="win-btn close" data-action="win-close" data-i18n-aria="win.close"></button>
         </div>
       </header>
 
       <div class="dock hud">
-        <div class="strip" role="listbox" aria-label="Images"></div>
+        <div class="strip" role="listbox" data-i18n-aria="aria.images"></div>
         <div class="controls">
-          <button class="icon-btn" data-action="prev" data-tip="Previous (Left)"></button>
-          <button class="play" data-action="play" data-tip="Slideshow (Space)">
+          <button class="icon-btn" data-action="prev" data-i18n-tip="tip.prev"></button>
+          <button class="play" data-action="play" data-i18n-tip="tip.play">
             <svg class="ring" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" /><circle class="progress" cx="22" cy="22" r="20" /></svg>
             <span class="play-icon"></span>
           </button>
-          <button class="icon-btn" data-action="next" data-tip="Next (Right)"></button>
+          <button class="icon-btn" data-action="next" data-i18n-tip="tip.next"></button>
           <span class="sep"></span>
-          <button class="icon-btn" data-action="zoom-out" data-tip="Zoom out (-)"></button>
-          <button class="zoom-label" data-action="zoom-toggle" data-tip="Fit / 100% (0 / 1)">100%</button>
-          <button class="icon-btn" data-action="zoom-in" data-tip="Zoom in (+)"></button>
+          <button class="icon-btn" data-action="zoom-out" data-i18n-tip="tip.zoomOut"></button>
+          <button class="zoom-label" data-action="zoom-toggle" data-i18n-tip="tip.zoomToggle">100%</button>
+          <button class="icon-btn" data-action="zoom-in" data-i18n-tip="tip.zoomIn"></button>
           <span class="sep"></span>
-          <button class="icon-btn" data-action="rotate" data-tip="Rotate (R)"></button>
-          <button class="icon-btn" data-action="flip" data-tip="Mirror (F)"></button>
-          <button class="icon-btn" data-action="backdrop" data-tip="Backdrop (B)"></button>
-          <button class="icon-btn" data-action="loupe" data-tip="Pixel loupe (L, hold Alt)"></button>
+          <button class="icon-btn" data-action="rotate" data-i18n-tip="tip.rotate"></button>
+          <button class="icon-btn" data-action="flip" data-i18n-tip="tip.flip"></button>
+          <button class="icon-btn" data-action="backdrop" data-i18n-tip="tip.backdrop"></button>
+          <button class="icon-btn" data-action="loupe" data-i18n-tip="tip.loupe"></button>
           <span class="sep"></span>
-          <button class="icon-btn" data-action="fullscreen" data-tip="Fullscreen (Enter)"></button>
+          <button class="icon-btn" data-action="fullscreen" data-i18n-tip="tip.fullscreen"></button>
         </div>
       </div>
 
-      <aside class="info-panel panel" aria-label="Image info"></aside>
-      <div class="palette-panel panel" aria-label="Palette"></div>
-      <section class="sheet" aria-label="Contact sheet"><div class="sheet-head"><span class="sheet-title"></span><button class="icon-btn" data-action="grid" aria-label="Close"></button></div><div class="sheet-grid"></div></section>
+      <aside class="info-panel panel" data-i18n-aria="aria.info"></aside>
+      <div class="palette-panel panel" data-i18n-aria="aria.palette"></div>
+      <section class="sheet" data-i18n-aria="aria.sheet"><div class="sheet-head"><span class="sheet-title"></span><button class="icon-btn" data-action="grid" data-i18n-aria="win.close"></button></div><div class="sheet-grid"></div></section>
       <canvas class="loupe" width="176" height="176" aria-hidden="true"></canvas>
       <div class="loupe-label" aria-hidden="true"></div>
-      <div class="drop-zone" aria-hidden="true"><div class="drop-card"><div class="drop-glyph"></div>Drop to view</div></div>
+      <div class="drop-zone" aria-hidden="true"><div class="drop-card"><div class="drop-glyph"></div><span data-i18n="drop"></span></div></div>
       <div class="menu" role="menu"></div>
       <div class="modal-layer"></div>
       <div class="toasts" aria-live="polite"></div>

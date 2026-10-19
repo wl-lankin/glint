@@ -1,0 +1,340 @@
+// Glint speaks English and German. The language follows the system unless the user picks one in
+// More > Language. Every German string must exist (the type of `de` enforces it) and use the same
+// {placeholders} as its English original (checked by the tests).
+
+export type Lang = 'en' | 'de';
+export type LanguagePreference = 'system' | Lang;
+
+const en = {
+  'start.tagline': 'Every image. Instantly.',
+  'start.open': 'Open images',
+  'start.drop': 'or drop them anywhere',
+  'start.formats': 'Supported formats',
+  'start.tip': 'Tip: select several images and open them together for a slideshow.',
+
+  'tip.open': 'Open (O)',
+  'tip.info': 'Info (I)',
+  'tip.palette': 'Palette (P)',
+  'tip.grid': 'Contact sheet (G)',
+  'tip.ambient': 'Ambient light (A)',
+  'tip.more': 'More',
+  'tip.prev': 'Previous (Left)',
+  'tip.play': 'Slideshow (Space)',
+  'tip.next': 'Next (Right)',
+  'tip.zoomOut': 'Zoom out (-)',
+  'tip.zoomToggle': 'Fit / 100% (0 / 1)',
+  'tip.zoomIn': 'Zoom in (+)',
+  'tip.rotate': 'Rotate (R)',
+  'tip.flip': 'Mirror (F)',
+  'tip.backdrop': 'Backdrop (B)',
+  'tip.loupe': 'Pixel loupe (L, hold Alt)',
+  'tip.fullscreen': 'Fullscreen (Enter)',
+
+  'win.minimize': 'Minimize',
+  'win.maximize': 'Maximize',
+  'win.restore': 'Restore',
+  'win.close': 'Close',
+
+  'aria.image': 'Image',
+  'aria.images': 'Images',
+  'aria.welcome': 'Welcome',
+  'aria.info': 'Image info',
+  'aria.palette': 'Palette',
+  'aria.sheet': 'Contact sheet',
+
+  'broken.title': "This image can't be shown",
+  'broken.heic': "{name} is HEIC. Windows can't decode it in this version of Glint; on macOS it opens.",
+  'broken.generic': "{name} is damaged or uses a variant Glint can't decode.",
+  'drop': 'Drop to view',
+  'format.image': 'Image',
+
+  'toast.backdrop.auto': 'Backdrop: ambient',
+  'toast.backdrop.checker': 'Backdrop: checkerboard',
+  'toast.backdrop.black': 'Backdrop: black',
+  'toast.backdrop.white': 'Backdrop: white',
+  'toast.slideshow': 'Slideshow · {seconds} s',
+  'toast.ambientOn': 'Ambient light on',
+  'toast.ambientOff': 'Ambient light off',
+  'toast.copied': 'Copied {value}',
+  'toast.imageCopied': 'Image copied',
+  'toast.imageCopyFailed': 'Could not copy the image',
+  'toast.copyFailed': 'Could not copy',
+  'toast.pathCopied': 'Path copied',
+
+  'update.pill': 'Restart to update to {version}',
+  'update.updating': 'Updating…',
+  'update.checking': 'Checking for updates…',
+  'update.current': 'You have the latest version',
+  'update.downloading': 'Downloading {version}… {percent}%',
+  'update.installing': 'Installing {version}…',
+  'update.error': 'Could not check for updates',
+  'update.auto': 'Updates install by themselves',
+
+  'info.format': 'Format',
+  'info.dimensions': 'Dimensions',
+  'info.resolution': 'Resolution',
+  'info.size': 'File size',
+  'info.modified': 'Modified',
+  'info.showInFolder': 'Show in folder',
+  'info.histogram': 'Histogram',
+  'info.camera': 'Camera',
+  'exif.Camera': 'Camera',
+  'exif.Lens': 'Lens',
+  'exif.Aperture': 'Aperture',
+  'exif.Exposure': 'Exposure',
+  'exif.ISO': 'ISO',
+  'exif.Focal length': 'Focal length',
+  'exif.Taken': 'Taken',
+  'exif.Software': 'Software',
+  'exif.Artist': 'Artist',
+  'exif.Copyright': 'Copyright',
+  'exif.Location': 'Location',
+
+  'palette.empty': 'No colors to read',
+  'palette.copy': 'Copy {hex}',
+  'sheet.one': '1 image',
+  'sheet.many': '{count} images',
+
+  'menu.copyImage': 'Copy image',
+  'menu.copyPath': 'Copy path',
+  'menu.showFinder': 'Show in Finder',
+  'menu.showExplorer': 'Show in Explorer',
+  'menu.rotate': 'Rotate',
+  'menu.mirror': 'Mirror',
+  'menu.info': 'Info',
+  'menu.slideshow': 'Slideshow',
+  'menu.seconds': '{count} seconds',
+  'menu.kenburns': 'Ken Burns',
+  'menu.crossfade': 'Crossfade',
+  'menu.cut': 'Cut',
+  'menu.autoplay': 'Start by itself',
+  'menu.backdrop': 'Backdrop',
+  'menu.backdrop.auto': 'Ambient',
+  'menu.backdrop.checker': 'Checkerboard',
+  'menu.backdrop.black': 'Black',
+  'menu.backdrop.white': 'White',
+  'menu.theme': 'Theme',
+  'menu.theme.dark': 'Dark',
+  'menu.theme.light': 'Light',
+  'menu.followSystem': 'Follow system',
+  'menu.language': 'Language',
+  'menu.shortcuts': 'Keyboard shortcuts',
+  'menu.about': 'About Glint',
+
+  'help.title': 'Keyboard shortcuts',
+  'help.browse': 'Browse',
+  'help.view': 'View',
+  'help.closer': 'Look closer',
+  'help.prevNext': 'Previous / next',
+  'help.firstLast': 'First / last',
+  'help.play': 'Play / pause slideshow',
+  'help.sheet': 'Contact sheet',
+  'help.open': 'Open images',
+  'help.wheel': 'Zoom at cursor',
+  'help.fit': 'Fit to window',
+  'help.actual': 'Actual size',
+  'help.zoom': 'Zoom in / out',
+  'help.dblclick': 'Zoom in / fit',
+  'help.rotate': 'Rotate',
+  'help.mirror': 'Mirror',
+  'help.fullscreen': 'Fullscreen',
+  'help.info': 'Info and histogram',
+  'help.palette': 'Color palette',
+  'help.loupe': 'Pixel loupe',
+  'help.ambient': 'Ambient light',
+  'help.backdrop': 'Backdrop for transparency',
+  'help.copy': 'Copy image',
+  'key.space': 'Space',
+  'key.wheel': 'Wheel',
+  'key.dblclick': 'Double-click',
+  'key.holdAlt': 'hold Alt',
+
+  'about.version': 'Version {version}',
+  'about.by': 'Designed & built by',
+  'about.source': 'Source on GitHub',
+  'about.legal': 'MIT License · © 2026 Wolfgang Linz',
+} as const;
+
+export type Key = keyof typeof en;
+
+const de: Record<Key, string> = {
+  'start.tagline': 'Jedes Bild. Sofort.',
+  'start.open': 'Bilder öffnen',
+  'start.drop': 'oder einfach hineinziehen',
+  'start.formats': 'Unterstützte Formate',
+  'start.tip': 'Tipp: Mehrere Bilder markieren und zusammen öffnen ergibt eine Diashow.',
+
+  'tip.open': 'Öffnen (O)',
+  'tip.info': 'Info (I)',
+  'tip.palette': 'Farbpalette (P)',
+  'tip.grid': 'Kontaktabzug (G)',
+  'tip.ambient': 'Umgebungslicht (A)',
+  'tip.more': 'Mehr',
+  'tip.prev': 'Vorheriges (Links)',
+  'tip.play': 'Diashow (Leertaste)',
+  'tip.next': 'Nächstes (Rechts)',
+  'tip.zoomOut': 'Verkleinern (-)',
+  'tip.zoomToggle': 'Einpassen / 100 % (0 / 1)',
+  'tip.zoomIn': 'Vergrößern (+)',
+  'tip.rotate': 'Drehen (R)',
+  'tip.flip': 'Spiegeln (F)',
+  'tip.backdrop': 'Hintergrund (B)',
+  'tip.loupe': 'Pixellupe (L, Alt halten)',
+  'tip.fullscreen': 'Vollbild (Enter)',
+
+  'win.minimize': 'Minimieren',
+  'win.maximize': 'Maximieren',
+  'win.restore': 'Wiederherstellen',
+  'win.close': 'Schließen',
+
+  'aria.image': 'Bild',
+  'aria.images': 'Bilder',
+  'aria.welcome': 'Willkommen',
+  'aria.info': 'Bildinfo',
+  'aria.palette': 'Farbpalette',
+  'aria.sheet': 'Kontaktabzug',
+
+  'broken.title': 'Dieses Bild lässt sich nicht anzeigen',
+  'broken.heic': '{name} ist ein HEIC-Bild. Unter Windows kann diese Glint-Version es nicht dekodieren, unter macOS öffnet es sich.',
+  'broken.generic': '{name} ist beschädigt oder nutzt eine Variante, die Glint nicht dekodieren kann.',
+  'drop': 'Zum Anzeigen loslassen',
+  'format.image': 'Bild',
+
+  'toast.backdrop.auto': 'Hintergrund: Umgebungslicht',
+  'toast.backdrop.checker': 'Hintergrund: Schachbrett',
+  'toast.backdrop.black': 'Hintergrund: Schwarz',
+  'toast.backdrop.white': 'Hintergrund: Weiß',
+  'toast.slideshow': 'Diashow · {seconds} s',
+  'toast.ambientOn': 'Umgebungslicht an',
+  'toast.ambientOff': 'Umgebungslicht aus',
+  'toast.copied': '{value} kopiert',
+  'toast.imageCopied': 'Bild kopiert',
+  'toast.imageCopyFailed': 'Das Bild konnte nicht kopiert werden',
+  'toast.copyFailed': 'Kopieren fehlgeschlagen',
+  'toast.pathCopied': 'Pfad kopiert',
+
+  'update.pill': 'Neu starten für Version {version}',
+  'update.updating': 'Wird aktualisiert…',
+  'update.checking': 'Suche nach Updates…',
+  'update.current': 'Du hast die neueste Version',
+  'update.downloading': 'Lade {version}… {percent} %',
+  'update.installing': 'Installiere {version}…',
+  'update.error': 'Updates konnten nicht geprüft werden',
+  'update.auto': 'Updates installieren sich von selbst',
+
+  'info.format': 'Format',
+  'info.dimensions': 'Abmessungen',
+  'info.resolution': 'Auflösung',
+  'info.size': 'Dateigröße',
+  'info.modified': 'Geändert',
+  'info.showInFolder': 'Im Ordner anzeigen',
+  'info.histogram': 'Histogramm',
+  'info.camera': 'Kamera',
+  'exif.Camera': 'Kamera',
+  'exif.Lens': 'Objektiv',
+  'exif.Aperture': 'Blende',
+  'exif.Exposure': 'Belichtung',
+  'exif.ISO': 'ISO',
+  'exif.Focal length': 'Brennweite',
+  'exif.Taken': 'Aufgenommen',
+  'exif.Software': 'Software',
+  'exif.Artist': 'Urheber',
+  'exif.Copyright': 'Copyright',
+  'exif.Location': 'Ort',
+
+  'palette.empty': 'Keine Farben lesbar',
+  'palette.copy': '{hex} kopieren',
+  'sheet.one': '1 Bild',
+  'sheet.many': '{count} Bilder',
+
+  'menu.copyImage': 'Bild kopieren',
+  'menu.copyPath': 'Pfad kopieren',
+  'menu.showFinder': 'Im Finder zeigen',
+  'menu.showExplorer': 'Im Explorer zeigen',
+  'menu.rotate': 'Drehen',
+  'menu.mirror': 'Spiegeln',
+  'menu.info': 'Info',
+  'menu.slideshow': 'Diashow',
+  'menu.seconds': '{count} Sekunden',
+  'menu.kenburns': 'Ken Burns',
+  'menu.crossfade': 'Überblenden',
+  'menu.cut': 'Harter Schnitt',
+  'menu.autoplay': 'Von selbst starten',
+  'menu.backdrop': 'Hintergrund',
+  'menu.backdrop.auto': 'Umgebungslicht',
+  'menu.backdrop.checker': 'Schachbrett',
+  'menu.backdrop.black': 'Schwarz',
+  'menu.backdrop.white': 'Weiß',
+  'menu.theme': 'Darstellung',
+  'menu.theme.dark': 'Dunkel',
+  'menu.theme.light': 'Hell',
+  'menu.followSystem': 'Wie System',
+  'menu.language': 'Sprache',
+  'menu.shortcuts': 'Tastenkürzel',
+  'menu.about': 'Über Glint',
+
+  'help.title': 'Tastenkürzel',
+  'help.browse': 'Blättern',
+  'help.view': 'Ansicht',
+  'help.closer': 'Genauer hinsehen',
+  'help.prevNext': 'Vorheriges / nächstes',
+  'help.firstLast': 'Erstes / letztes',
+  'help.play': 'Diashow starten / anhalten',
+  'help.sheet': 'Kontaktabzug',
+  'help.open': 'Bilder öffnen',
+  'help.wheel': 'Zoom an der Mausposition',
+  'help.fit': 'An Fenster anpassen',
+  'help.actual': 'Originalgröße',
+  'help.zoom': 'Vergrößern / verkleinern',
+  'help.dblclick': 'Vergrößern / einpassen',
+  'help.rotate': 'Drehen',
+  'help.mirror': 'Spiegeln',
+  'help.fullscreen': 'Vollbild',
+  'help.info': 'Info und Histogramm',
+  'help.palette': 'Farbpalette',
+  'help.loupe': 'Pixellupe',
+  'help.ambient': 'Umgebungslicht',
+  'help.backdrop': 'Hintergrund für Transparenz',
+  'help.copy': 'Bild kopieren',
+  'key.space': 'Leertaste',
+  'key.wheel': 'Mausrad',
+  'key.dblclick': 'Doppelklick',
+  'key.holdAlt': 'Alt halten',
+
+  'about.version': 'Version {version}',
+  'about.by': 'Gestaltet & entwickelt von',
+  'about.source': 'Quellcode auf GitHub',
+  'about.legal': 'MIT-Lizenz · © 2026 Wolfgang Linz',
+};
+
+export const dictionaries: Record<Lang, Record<Key, string>> = { en, de };
+
+let current: Lang = 'en';
+
+/** German for every German system locale (de, de-DE, de-AT, de-CH, ...), English otherwise. */
+export function detectLanguage(preference: LanguagePreference, systemLanguages: readonly string[]): Lang {
+  if (preference !== 'system') return preference;
+  const first = systemLanguages[0]?.toLowerCase() ?? '';
+  return first === 'de' || first.startsWith('de-') ? 'de' : 'en';
+}
+
+export function setLanguage(lang: Lang) {
+  current = lang;
+  document.documentElement.lang = lang;
+}
+
+export function language(): Lang {
+  return current;
+}
+
+export function t(key: Key, vars: Record<string, string | number> = {}): string {
+  const text: string = dictionaries[current][key] ?? en[key] ?? key;
+  return text.replace(/\{(\w+)\}/g, (match, name: string) => (name in vars ? String(vars[name]) : match));
+}
+
+/** Translates the static markup: data-i18n (text), data-i18n-tip (tooltip), data-i18n-aria (label). */
+export function translateDom(root: ParentNode) {
+  root.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => (el.textContent = t(el.dataset.i18n as Key)));
+  root.querySelectorAll<HTMLElement>('[data-i18n-tip]').forEach((el) => (el.dataset.tip = t(el.dataset.i18nTip as Key)));
+  root.querySelectorAll<HTMLElement>('[data-i18n-aria]').forEach((el) => el.setAttribute('aria-label', t(el.dataset.i18nAria as Key)));
+}

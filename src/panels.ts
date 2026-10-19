@@ -1,5 +1,6 @@
 import type { App } from './app';
 import { icons } from './icons';
+import { t, type Key } from './i18n';
 import { extractPalette, inkFor, toHex } from './palette';
 import type { Settings } from './settings';
 import { baseName, dirName, el, extension, formatBytes, formatDate, formatLabel, megapixels } from './util';
@@ -58,7 +59,7 @@ export class Panels {
     });
     this.palette.addEventListener('click', (e) => {
       const sw = (e.target as HTMLElement).closest<HTMLElement>('[data-hex]');
-      if (sw) void this.copyText(sw.dataset.hex!, `Copied ${sw.dataset.hex}`);
+      if (sw) void this.copyText(sw.dataset.hex!, t('toast.copied', { value: sw.dataset.hex! }));
     });
     this.info.addEventListener('click', (e) => {
       const reveal = (e.target as HTMLElement).closest('[data-reveal]');
@@ -128,13 +129,24 @@ export class Panels {
     const ext = extension(path);
     text.textContent =
       ['heic', 'heif'].includes(ext) && this.app.backend.platform !== 'mac'
-        ? `${baseName(path)} is HEIC. Windows can't decode it in this version of Glint; on macOS it opens.`
-        : `${baseName(path)} is damaged or uses a variant Glint can't decode.`;
+        ? t('broken.heic', { name: baseName(path) })
+        : t('broken.generic', { name: baseName(path) });
     box.hidden = false;
   }
 
   hideBroken() {
     this.app.root.querySelector<HTMLElement>('.broken')!.hidden = true;
+  }
+
+  /** Re-renders what is on screen after the language changed. */
+  relocalize() {
+    this.closeMenu();
+    if (this.app.root.classList.contains('modal-open')) this.closeModal();
+    if (this.app.root.classList.contains('info-open')) this.renderInfo();
+    if (this.app.root.classList.contains('sheet-open')) this.renderSheet();
+    if (this.app.broken && this.app.current) this.renderBroken(this.app.current);
+    this.paletteFor = '';
+    if (this.app.root.classList.contains('palette-open')) this.renderPalette();
   }
 
   // ---------------------------------------------------------------- info
@@ -150,19 +162,19 @@ export class Panels {
     if (!path) return;
     const info = app.info;
     const rows: [string, string][] = [];
-    rows.push(['Format', formatLabel(info?.format, path)]);
-    if (!app.broken) rows.push(['Dimensions', `${app.natural.w} × ${app.natural.h}`]);
+    rows.push([t('info.format'), formatLabel(info?.format, path)]);
+    if (!app.broken) rows.push([t('info.dimensions'), `${app.natural.w} × ${app.natural.h}`]);
     const mp = megapixels(app.natural.w, app.natural.h);
-    if (mp && !app.broken) rows.push(['Resolution', mp]);
-    if (info) rows.push(['File size', formatBytes(info.size)]);
-    if (info?.modified) rows.push(['Modified', formatDate(info.modified)]);
+    if (mp && !app.broken) rows.push([t('info.resolution'), mp]);
+    if (info) rows.push([t('info.size'), formatBytes(info.size)]);
+    if (info?.modified) rows.push([t('info.modified'), formatDate(info.modified)]);
 
     const head = el('div', 'panel-head');
     const title = el('div', 'panel-title');
     title.textContent = baseName(path);
     const folder = el('button', 'panel-path');
     folder.dataset.reveal = '';
-    folder.title = 'Show in folder';
+    folder.title = t('info.showInFolder');
     folder.innerHTML = icons.reveal;
     const folderText = el('span');
     folderText.textContent = dirName(path) || path;
@@ -188,10 +200,10 @@ export class Panels {
     const histogram = this.histogram();
     if (histogram) {
       const section = el('section', 'kv');
-      section.append(el('h3', '', 'Histogram'), histogram);
+      section.append(el('h3', '', t('info.histogram')), histogram);
       parts.push(section);
     }
-    if (info?.exif.length) parts.push(table(info.exif, 'Camera'));
+    if (info?.exif.length) parts.push(table(info.exif.map(([k, v]) => [exifLabel(k), v]), t('info.camera')));
     this.info.replaceChildren(...parts);
   }
 
@@ -253,7 +265,7 @@ export class Panels {
       }
     }
     if (!swatches.length) {
-      this.palette.replaceChildren(el('div', 'palette-empty', 'No colors to read'));
+      this.palette.replaceChildren(el('div', 'palette-empty', t('palette.empty')));
       return;
     }
     const nodes = swatches.map((s, i) => {
@@ -263,7 +275,7 @@ export class Panels {
       sw.style.setProperty('--c', hex);
       sw.style.setProperty('--ink', inkFor(s.r, s.g, s.b));
       sw.style.setProperty('--i', String(i));
-      sw.title = `Copy ${hex}`;
+      sw.title = t('palette.copy', { hex });
       const label = el('span', 'swatch-hex');
       label.textContent = hex;
       const share = el('span', 'swatch-share');
@@ -290,7 +302,7 @@ export class Panels {
 
   private renderSheet() {
     const app = this.app;
-    this.sheet.querySelector('.sheet-title')!.textContent = `${app.items.length} image${app.items.length === 1 ? '' : 's'}`;
+    this.sheet.querySelector('.sheet-title')!.textContent = app.items.length === 1 ? t('sheet.one') : t('sheet.many', { count: app.items.length });
     const grid = this.sheet.querySelector<HTMLElement>('.sheet-grid')!;
     const frag = document.createDocumentFragment();
     app.items.forEach((path, i) => {
@@ -321,9 +333,9 @@ export class Panels {
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error('empty');
       await this.app.backend.copyPng(new Uint8Array(await blob.arrayBuffer()));
-      this.toast('Image copied');
+      this.toast(t('toast.imageCopied'));
     } catch {
-      this.toast('Could not copy the image');
+      this.toast(t('toast.imageCopyFailed'));
     }
   }
 
@@ -332,7 +344,7 @@ export class Panels {
       await this.app.backend.copyText(text);
       this.toast(message);
     } catch {
-      this.toast('Could not copy');
+      this.toast(t('toast.copyFailed'));
     }
   }
 
@@ -360,13 +372,13 @@ export class Panels {
   openContextMenu(x: number, y: number) {
     const app = this.app;
     const items: MenuItem[] = [
-      { label: 'Copy image', icon: icons.copy, hint: this.mod('C'), run: () => void this.copyImage() },
-      { label: 'Copy path', icon: icons.path, run: () => app.current && void this.copyText(app.current, 'Path copied') },
-      { label: app.backend.platform === 'mac' ? 'Show in Finder' : 'Show in Explorer', icon: icons.reveal, run: () => app.current && void app.backend.reveal(app.current) },
+      { label: t('menu.copyImage'), icon: icons.copy, hint: this.mod('C'), run: () => void this.copyImage() },
+      { label: t('menu.copyPath'), icon: icons.path, run: () => app.current && void this.copyText(app.current, t('toast.pathCopied')) },
+      { label: t(app.backend.platform === 'mac' ? 'menu.showFinder' : 'menu.showExplorer'), icon: icons.reveal, run: () => app.current && void app.backend.reveal(app.current) },
       { label: '' },
-      { label: 'Rotate', icon: icons.rotate, hint: 'R', run: () => app.rotate(90) },
-      { label: 'Mirror', icon: icons.flip, hint: 'F', run: () => app.flip() },
-      { label: 'Info', icon: icons.info, hint: 'I', run: () => this.toggleInfo() },
+      { label: t('menu.rotate'), icon: icons.rotate, hint: 'R', run: () => app.rotate(90) },
+      { label: t('menu.mirror'), icon: icons.flip, hint: 'F', run: () => app.flip() },
+      { label: t('menu.info'), icon: icons.info, hint: 'I', run: () => this.toggleInfo() },
     ];
     this.showMenu(items, x, y, 'left');
   }
@@ -380,41 +392,49 @@ export class Panels {
     const s = app.settings;
     const choose = <K extends keyof Settings>(key: K, value: Settings[K]) => () => app.update({ [key]: value } as Partial<Settings>);
     return [
-      { label: 'Copy image', icon: icons.copy, hint: this.mod('C'), run: () => void this.copyImage() },
-      { label: app.backend.platform === 'mac' ? 'Show in Finder' : 'Show in Explorer', icon: icons.reveal, run: () => app.current && void app.backend.reveal(app.current) },
+      { label: t('menu.copyImage'), icon: icons.copy, hint: this.mod('C'), run: () => void this.copyImage() },
+      { label: t(app.backend.platform === 'mac' ? 'menu.showFinder' : 'menu.showExplorer'), icon: icons.reveal, run: () => app.current && void app.backend.reveal(app.current) },
       { label: '' },
       {
-        label: 'Slideshow',
+        label: t('menu.slideshow'),
         submenu: [
-          ...[3, 5, 8, 12].map((n) => ({ label: `${n} seconds`, checked: s.interval === n, run: choose('interval', n) })),
+          ...[3, 5, 8, 12].map((n) => ({ label: t('menu.seconds', { count: n }), checked: s.interval === n, run: choose('interval', n) })),
           { label: '' },
-          { label: 'Ken Burns', checked: s.transition === 'kenburns', run: choose('transition', 'kenburns') },
-          { label: 'Crossfade', checked: s.transition === 'fade', run: choose('transition', 'fade') },
-          { label: 'Cut', checked: s.transition === 'none', run: choose('transition', 'none') },
+          { label: t('menu.kenburns'), checked: s.transition === 'kenburns', run: choose('transition', 'kenburns') },
+          { label: t('menu.crossfade'), checked: s.transition === 'fade', run: choose('transition', 'fade') },
+          { label: t('menu.cut'), checked: s.transition === 'none', run: choose('transition', 'none') },
           { label: '' },
-          { label: 'Start by itself', checked: s.autoplay, run: () => app.update({ autoplay: !s.autoplay }) },
+          { label: t('menu.autoplay'), checked: s.autoplay, run: () => app.update({ autoplay: !s.autoplay }) },
         ],
       },
       {
-        label: 'Backdrop',
+        label: t('menu.backdrop'),
         submenu: [
-          { label: 'Ambient', checked: s.backdrop === 'auto', run: choose('backdrop', 'auto') },
-          { label: 'Checkerboard', checked: s.backdrop === 'checker', run: choose('backdrop', 'checker') },
-          { label: 'Black', checked: s.backdrop === 'black', run: choose('backdrop', 'black') },
-          { label: 'White', checked: s.backdrop === 'white', run: choose('backdrop', 'white') },
+          { label: t('menu.backdrop.auto'), checked: s.backdrop === 'auto', run: choose('backdrop', 'auto') },
+          { label: t('menu.backdrop.checker'), checked: s.backdrop === 'checker', run: choose('backdrop', 'checker') },
+          { label: t('menu.backdrop.black'), checked: s.backdrop === 'black', run: choose('backdrop', 'black') },
+          { label: t('menu.backdrop.white'), checked: s.backdrop === 'white', run: choose('backdrop', 'white') },
         ],
       },
       {
-        label: 'Theme',
+        label: t('menu.theme'),
         submenu: [
-          { label: 'Dark', checked: s.theme === 'dark', run: choose('theme', 'dark') },
-          { label: 'Light', checked: s.theme === 'light', run: choose('theme', 'light') },
-          { label: 'Follow system', checked: s.theme === 'system', run: choose('theme', 'system') },
+          { label: t('menu.theme.dark'), checked: s.theme === 'dark', run: choose('theme', 'dark') },
+          { label: t('menu.theme.light'), checked: s.theme === 'light', run: choose('theme', 'light') },
+          { label: t('menu.followSystem'), checked: s.theme === 'system', run: choose('theme', 'system') },
+        ],
+      },
+      {
+        label: t('menu.language'),
+        submenu: [
+          { label: t('menu.followSystem'), checked: s.language === 'system', run: choose('language', 'system') },
+          { label: 'English', checked: s.language === 'en', run: choose('language', 'en') },
+          { label: 'Deutsch', checked: s.language === 'de', run: choose('language', 'de') },
         ],
       },
       { label: '' },
-      { label: 'Keyboard shortcuts', icon: icons.keyboard, hint: '?', run: () => this.openHelp() },
-      { label: 'About Glint', icon: icons.image, run: () => this.openAbout() },
+      { label: t('menu.shortcuts'), icon: icons.keyboard, hint: '?', run: () => this.openHelp() },
+      { label: t('menu.about'), icon: icons.image, run: () => this.openAbout() },
     ];
   }
 
@@ -493,27 +513,27 @@ export class Panels {
 
   openHelp() {
     const mod = this.app.backend.platform === 'mac' ? '⌘' : 'Ctrl';
-    const groups: [string, [string, string][]][] = [
-      ['Browse', [['← →', 'Previous / next'], ['Home End', 'First / last'], ['Space', 'Play / pause slideshow'], ['G', 'Contact sheet'], ['O', 'Open images']]],
-      ['View', [['Wheel', 'Zoom at cursor'], ['0', 'Fit to window'], ['1', 'Actual size'], ['+ −', 'Zoom in / out'], ['Double-click', 'Zoom in / fit'], ['R  Shift R', 'Rotate'], ['F', 'Mirror'], ['Enter', 'Fullscreen']]],
-      ['Look closer', [['I', 'Info and histogram'], ['P', 'Color palette'], ['L / hold Alt', 'Pixel loupe'], ['A', 'Ambient light'], ['B', 'Backdrop for transparency'], [`${mod} C`, 'Copy image']]],
+    const groups: [Key, [string[], Key][]][] = [
+      ['help.browse', [[['←', '→'], 'help.prevNext'], [['Home', 'End'], 'help.firstLast'], [[t('key.space')], 'help.play'], [['G'], 'help.sheet'], [['O'], 'help.open']]],
+      ['help.view', [[[t('key.wheel')], 'help.wheel'], [['0'], 'help.fit'], [['1'], 'help.actual'], [['+', '−'], 'help.zoom'], [[t('key.dblclick')], 'help.dblclick'], [['R', 'Shift R'], 'help.rotate'], [['F'], 'help.mirror'], [['Enter'], 'help.fullscreen']]],
+      ['help.closer', [[['I'], 'help.info'], [['P'], 'help.palette'], [['L', t('key.holdAlt')], 'help.loupe'], [['A'], 'help.ambient'], [['B'], 'help.backdrop'], [[`${mod} C`], 'help.copy']]],
     ];
     const body = el('div', 'help');
-    body.append(el('h2', '', 'Keyboard shortcuts'));
+    body.append(el('h2', '', t('help.title')));
     const cols = el('div', 'help-cols');
     for (const [title, keys] of groups) {
       const col = el('section');
-      col.append(el('h3', '', title));
+      col.append(el('h3', '', t(title)));
       for (const [k, v] of keys) {
         const row = el('div', 'help-row');
         const keysBox = el('span', 'help-keys');
-        k.split(/\s+/).forEach((part) => {
+        k.forEach((part) => {
           const kbd = el('kbd');
           kbd.textContent = part;
           keysBox.append(kbd);
         });
         const label = el('span');
-        label.textContent = v;
+        label.textContent = t(v);
         row.append(keysBox, label);
         col.append(row);
       }
@@ -528,22 +548,27 @@ export class Panels {
     body.innerHTML = `
       <div class="about-mark"><div class="about-halo"></div><img src="${logoUrl}" alt="" width="112" height="112" /></div>
       <h2 class="wordmark">Glint</h2>
-      <p class="about-version">Version <span data-version>1.0.0</span></p>
-      <p class="about-tagline">Every image. Instantly.</p>
+      <p class="about-version" data-version></p>
+      <p class="about-tagline"></p>
       <div class="about-card">
-        <span class="about-label">Designed &amp; built by</span>
+        <span class="about-label"></span>
         <span class="about-name">Wolfgang Linz</span>
         <button class="about-link" data-href="${AUTHOR_URL}">wolfgang-linz.de ${icons.external}</button>
       </div>
       <div class="about-row">
-        <button class="ghost-btn" data-href="https://github.com/${REPO}">${icons.github}<span>Source on GitHub</span></button>
-        <span class="about-update" data-update>Checking for updates…</span>
+        <button class="ghost-btn" data-href="https://github.com/${REPO}">${icons.github}<span class="about-source"></span></button>
+        <span class="about-update" data-update></span>
       </div>
-      <p class="about-legal">MIT License · © 2026 Wolfgang Linz</p>`;
+      <p class="about-legal"></p>`;
+    const text = (selector: string, key: Key) => (body.querySelector(selector)!.textContent = t(key));
+    text('.about-tagline', 'start.tagline');
+    text('.about-label', 'about.by');
+    text('.about-source', 'about.source');
+    text('.about-legal', 'about.legal');
     this.openModal(body, 'modal-about');
     this.renderUpdate();
     void this.app.backend.version().then((v) => {
-      body.querySelector('[data-version]')!.textContent = v;
+      body.querySelector('[data-version]')!.textContent = t('about.version', { version: v });
     });
     const updates = this.app.backend.updates;
     if (updates.state.phase === 'current' || updates.state.phase === 'error') void updates.check();
@@ -557,29 +582,29 @@ export class Panels {
     target.replaceChildren();
     switch (s.phase) {
       case 'checking':
-        target.textContent = 'Checking for updates…';
+        target.textContent = t('update.checking');
         return;
       case 'current':
-        target.textContent = 'You have the latest version';
+        target.textContent = t('update.current');
         return;
       case 'downloading':
-        target.textContent = `Downloading ${s.version}… ${Math.round((s.progress ?? 0) * 100)}%`;
+        target.textContent = t('update.downloading', { version: s.version ?? '', percent: Math.round((s.progress ?? 0) * 100) });
         return;
       case 'installing':
-        target.textContent = `Installing ${s.version}…`;
+        target.textContent = t('update.installing', { version: s.version ?? '' });
         return;
       case 'ready': {
         const button = el('button', 'about-new');
-        button.textContent = `Restart to update to ${s.version}`;
+        button.textContent = t('update.pill', { version: s.version ?? '' });
         button.addEventListener('click', () => void this.app.backend.updates.installNow());
         target.append(button);
         return;
       }
       case 'error':
-        target.textContent = 'Could not check for updates';
+        target.textContent = t('update.error');
         return;
       default:
-        target.textContent = 'Updates install by themselves';
+        target.textContent = t('update.auto');
     }
   }
 
@@ -595,4 +620,11 @@ export class Panels {
     if (root.classList.contains('sheet-open') && e.key === 'Enter') return (this.closeSheet(), true);
     return false;
   }
+}
+
+/** EXIF rows arrive from Rust with English labels; they double as translation keys. */
+function exifLabel(label: string): string {
+  const key = `exif.${label}` as Key;
+  const text = t(key);
+  return text === key ? label : text;
 }

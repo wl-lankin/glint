@@ -1,6 +1,6 @@
 {
   "name": "glint",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Glint - every image, instantly. A fast, beautiful image viewer for Windows and macOS.",
   "author": "Wolfgang Linz <https://wolfgang-linz.de>",
   "license": "MIT",
@@ -24,6 +24,7 @@
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
     "@tauri-apps/cli": "^2.12.3",
+    "jsdom": "^27.4.0",
     "typescript": "^5.9.3",
     "vite": "^8.3.4",
     "vitest": "^5.0.5"

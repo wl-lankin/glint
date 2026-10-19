@@ -42,6 +42,7 @@ Get the latest version from the **[Releases page](https://github.com/wl-lankin/g
 - **Pixel loupe.** Hold Alt (or press L) for a magnifier with a pixel grid and the color under the cursor.
 - **Info and histogram.** Dimensions, file size, dates, an RGB histogram and camera data from EXIF.
 - **Transparency done right.** Show transparent images on the ambient glow, a checkerboard, black or white.
+- **English and German.** Glint follows your system language and can be switched under More > Language.
 - **Always current.** Glint checks GitHub for new releases, downloads them in the background and installs them when you close it (or right away with "Restart to update"). Updates are signed; Glint accepts only builds from this repository.
 - **Fast and light.** A native Rust core with the system WebView: a small download, a quick start, smooth zoom and pan.
 
@@ -72,6 +73,12 @@ Get the latest version from the **[Releases page](https://github.com/wl-lankin/g
 | Ctrl+C / Cmd+C | Copy the image |
 | O / Ctrl+O | Open images |
 | ? | All shortcuts |
+
+## Auf Deutsch
+
+Glint ist ein schneller, schöner Bildbetrachter für Windows und macOS. Er öffnet jedes gängige Bildformat (auch SVG, PSD, TIFF, JPEG XL, EXR und HEIC unter macOS), macht aus mehreren markierten Bildern automatisch eine Diashow, taucht jedes Bild in ein Umgebungslicht aus seinen eigenen Farben und bietet Kontaktabzug, Farbpalette, Pixellupe sowie Infos mit Histogramm und EXIF-Daten. Die Oberfläche folgt der Systemsprache (Deutsch oder Englisch), Updates installieren sich von selbst.
+
+**Installation:** den passenden Download von der [Release-Seite](https://github.com/wl-lankin/glint/releases/latest) holen. **Als Standard festlegen** unter Windows 11: Rechtsklick auf ein Bild > **Öffnen mit** > **Andere App auswählen** > **Glint** > **Immer**. Unter macOS: Bild im Finder markieren > **Informationen** (Cmd+I) > **Öffnen mit: Glint** > **Alle ändern...**
 
 ## Build from source
 

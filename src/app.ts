@@ -1,5 +1,6 @@
 import type { Backend, FileInfo } from './backend';
 import { icons } from './icons';
+import { detectLanguage, setLanguage, t, translateDom } from './i18n';
 import { Loupe } from './loupe';
 import { Panels } from './panels';
 import { loadSettings, saveSettings, type Settings } from './settings';
@@ -42,6 +43,7 @@ export class App {
   private hudTimer = 0;
   private hudPinned = false;
   private fullscreen = false;
+  private lang = '';
 
   constructor(readonly backend: Backend) {
     this.slots = [...this.stage.querySelectorAll<HTMLElement>('.slide')].map((slide) => ({
@@ -77,13 +79,11 @@ export class App {
       this.root.classList.toggle('is-maximized', max);
       const btn = this.root.querySelector<HTMLElement>('[data-action="win-max"]')!;
       btn.innerHTML = max ? icons.winRestore : icons.winMax;
-      btn.setAttribute('aria-label', max ? 'Restore' : 'Maximize');
+      btn.dataset.i18nAria = max ? 'win.restore' : 'win.maximize';
+      btn.setAttribute('aria-label', t(max ? 'win.restore' : 'win.maximize'));
     });
-    this.backend.updates.onChange((s) => {
-      const pill = this.root.querySelector<HTMLButtonElement>('.update-pill')!;
-      pill.hidden = s.phase !== 'ready' && s.phase !== 'installing';
-      pill.disabled = s.phase === 'installing';
-      pill.querySelector('.update-text')!.textContent = s.phase === 'installing' ? 'Updating…' : `Restart to update to ${s.version}`;
+    this.backend.updates.onChange(() => {
+      this.renderUpdatePill();
       this.panels.renderUpdate();
     });
     new ResizeObserver(() => this.onResize()).observe(this.stage);
@@ -324,6 +324,15 @@ export class App {
 
   applySettings() {
     const s = this.settings;
+    const lang = detectLanguage(s.language, navigator.languages?.length ? navigator.languages : [navigator.language]);
+    if (lang !== this.lang) {
+      this.lang = lang;
+      setLanguage(lang);
+      translateDom(this.root);
+      this.renderMeta();
+      this.renderUpdatePill();
+      this.panels.relocalize();
+    }
     const dark = s.theme === 'dark' || (s.theme === 'system' && !matchMedia('(prefers-color-scheme: light)').matches);
     this.root.dataset.theme = dark ? 'dark' : 'light';
     this.root.dataset.backdrop = s.backdrop;
@@ -337,8 +346,7 @@ export class App {
     const order: Settings['backdrop'][] = ['auto', 'checker', 'black', 'white'];
     const backdrop = order[(order.indexOf(this.settings.backdrop) + 1) % order.length];
     this.update({ backdrop });
-    const names = { auto: 'Backdrop: ambient', checker: 'Backdrop: checkerboard', black: 'Backdrop: black', white: 'Backdrop: white' };
-    this.panels.toast(names[backdrop]);
+    this.panels.toast(t(`toast.backdrop.${backdrop}`));
   }
 
   // ---------------------------------------------------------------- chrome
@@ -360,6 +368,14 @@ export class App {
     meta.textContent = parts.join('  ·  ');
     this.root.classList.toggle('has-many', this.items.length > 1);
     this.root.classList.toggle('is-set', this.source === 'set');
+  }
+
+  private renderUpdatePill() {
+    const s = this.backend.updates.state;
+    const pill = this.root.querySelector<HTMLButtonElement>('.update-pill')!;
+    pill.hidden = s.phase !== 'ready' && s.phase !== 'installing';
+    pill.disabled = s.phase === 'installing';
+    pill.querySelector('.update-text')!.textContent = s.phase === 'installing' ? t('update.updating') : t('update.pill', { version: s.version ?? '' });
   }
 
   renderPlay(playing: boolean, progress: number) {
@@ -412,7 +428,7 @@ export class App {
     this.slideshow.toggle();
     if (this.slideshow.playing) {
       if (this.view.mode === 'free') this.fit();
-      this.panels.toast(`Slideshow · ${this.settings.interval} s`);
+      this.panels.toast(t('toast.slideshow', { seconds: this.settings.interval }));
     }
   }
 
@@ -422,7 +438,7 @@ export class App {
       case 'info': return this.panels.toggleInfo();
       case 'palette': return this.panels.togglePalette();
       case 'grid': return this.panels.toggleSheet();
-      case 'ambient': this.update({ ambient: !this.settings.ambient }); return this.panels.toast(this.settings.ambient ? 'Ambient light on' : 'Ambient light off');
+      case 'ambient': this.update({ ambient: !this.settings.ambient }); return this.panels.toast(t(this.settings.ambient ? 'toast.ambientOn' : 'toast.ambientOff'));
       case 'menu': return this.panels.openMenu(anchor!);
       case 'prev': return void this.go(-1);
       case 'next': return void this.go(1);
@@ -521,7 +537,7 @@ export class App {
       const dx = e.clientX - drag.x;
       if (!drag.moved && this.loupe.active) {
         const hex = this.loupe.currentHex();
-        if (hex) void this.panels.copyText(hex, `Copied ${hex}`);
+        if (hex) void this.panels.copyText(hex, t('toast.copied', { value: hex }));
       }
       if (!drag.pan) {
         this.slot.slide.style.setProperty('--swipe', '0px');

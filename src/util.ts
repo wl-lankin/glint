@@ -1,3 +1,5 @@
+import { language, t } from './i18n';
+
 export function baseName(path: string): string {
   const parts = path.split(/[\\/]/);
   return parts[parts.length - 1] || path;
@@ -23,16 +25,18 @@ export function formatBytes(bytes: number): string {
     v /= 1024;
     u++;
   } while (v >= 1024 && u < units.length - 1);
-  return `${v >= 100 ? Math.round(v) : v.toFixed(1)} ${units[u]}`;
+  const digits = v >= 100 ? 0 : 1;
+  return `${v.toLocaleString(language(), { minimumFractionDigits: digits, maximumFractionDigits: digits })} ${units[u]}`;
 }
 
-export function formatDate(ms: number, locale?: string): string {
+export function formatDate(ms: number, locale: string = language()): string {
   return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(ms));
 }
 
 export function megapixels(w: number, h: number): string {
   const mp = (w * h) / 1e6;
-  return mp >= 0.1 ? `${mp.toFixed(mp >= 10 ? 0 : 1)} MP` : '';
+  const digits = mp >= 10 ? 0 : 1;
+  return mp >= 0.1 ? `${mp.toLocaleString(language(), { minimumFractionDigits: digits, maximumFractionDigits: digits })} MP` : '';
 }
 
 /** Human label for a sniffed format or, failing that, the extension. */
@@ -42,7 +46,7 @@ export function formatLabel(format: string | null | undefined, path: string): st
     ico: 'ICO', tiff: 'TIFF', tga: 'TGA', qoi: 'QOI', dds: 'DDS', hdr: 'Radiance HDR', exr: 'OpenEXR',
     pnm: 'Netpbm', farbfeld: 'farbfeld', jxl: 'JPEG XL', psd: 'Photoshop',
   };
-  return (format && names[format]) || extension(path).toUpperCase() || 'Image';
+  return (format && names[format]) || extension(path).toUpperCase() || t('format.image');
 }
 
 /** Compares semver-ish tags like "v1.2.0"; positive when `a` is newer. */
