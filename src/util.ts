@@ -1,6 +1,8 @@
 import { language, t } from './i18n';
 
 export function baseName(path: string): string {
+  // Files dropped in the browser demo are blob URLs that carry their name after '#'.
+  if (path.startsWith('blob:') && path.includes('#')) return path.slice(path.lastIndexOf('#') + 1);
   const parts = path.split(/[\\/]/);
   return parts[parts.length - 1] || path;
 }

@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8">
+<!-- OG-Bild für wolfgang-linz.de/glint. Zum Rendern in den Ordner glint/ der Website legen (nutzt ../fonts/fonts.css, glint.css und assets/) und 1200 × 630 nach assets/og.png fotografieren. -->
+<link rel="stylesheet" href="../fonts/fonts.css"><link rel="stylesheet" href="glint.css">
+<style>
+html,body{margin:0;width:1200px;height:630px;overflow:hidden;background:#07080c}
+.og{position:relative;width:1200px;height:630px;overflow:hidden;isolation:isolate}
+.light{position:absolute;inset:-80px;z-index:-1;background:url(assets/screenshot.png) 70% 50%/cover;filter:blur(90px) saturate(1.8) brightness(.6)}
+.og::after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#07080c 0%,rgba(7,8,12,.86) 34%,rgba(7,8,12,.15) 70%)}
+.shot{position:absolute;left:560px;top:96px;width:720px;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.14),0 50px 100px -20px rgba(0,0,0,.85),0 0 160px -30px rgba(255,140,60,.55);transform:perspective(1600px) rotateY(-14deg) rotateX(4deg);transform-origin:0 50%}
+.shot img{display:block;width:100%}
+.copy{position:absolute;left:64px;top:150px;width:520px}
+.wm{display:flex;align-items:center;gap:12px;font:600 22px var(--body);color:#f3f4f8;margin-bottom:26px}
+.wm img{width:40px;height:40px}
+h1{margin:0;font:700 82px/.95 var(--body);letter-spacing:-.055em;color:#f3f4f8}
+h1 em{display:block;font-size:1.08em;margin-top:2px}
+p{margin:24px 0 0;font:400 21px/1.45 var(--body);color:#a3a8b8;max-width:440px}
+.chips{display:flex;gap:8px;margin-top:26px}
+.chips span{font:500 14px var(--body);padding:7px 12px;border-radius:99px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);color:#f3f4f8}
+</style></head><body><div class="og">
+<div class="light"></div>
+<figure class="shot" style="margin:0"><img src="assets/screenshot.png" alt=""></figure>
+<div class="copy"><div class="wm"><img src="assets/glint-icon.svg" alt="">Glint</div><h1>Jedes Bild. <em>Sofort.</em></h1>
+<p>Der schnelle Bildbetrachter, in dem jedes Bild in seinen eigenen Farben leuchtet.</p>
+<div class="chips"><span>Kostenlos</span><span>Open Source</span><span>Windows</span><span>macOS</span></div></div>
+</div></body></html>

@@ -1,0 +1,14 @@
+/* Native window chrome is not there in a browser: draw the macOS traffic lights. */
+.app[data-platform="mac"] .traffic-space {
+  display: flex;
+  align-items: center;
+  padding-left: 2px;
+}
+.app[data-platform="mac"] .traffic-space::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f57;
+  box-shadow: 20px 0 0 #febc2e, 40px 0 0 #28c840;
+}
