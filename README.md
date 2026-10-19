@@ -22,10 +22,12 @@ Glint opens any image the moment you double-click it, then gets out of the way. 
 
 Get the latest version from the **[Releases page](https://github.com/wl-lankin/glint/releases/latest)**:
 
-| Platform | File |
+| Platform | Download |
 | --- | --- |
-| Windows 10/11 (x64) | `Glint_<version>_x64-setup.exe` |
-| macOS 11+ (Apple Silicon and Intel) | `Glint_<version>_universal.dmg` |
+| Windows 10/11 (x64) | [Glint_x64-setup.exe](https://github.com/wl-lankin/glint/releases/latest/download/Glint_x64-setup.exe) |
+| macOS 11+ (Apple Silicon and Intel) | [Glint_universal.dmg](https://github.com/wl-lankin/glint/releases/latest/download/Glint_universal.dmg) |
+
+These links always point to the newest version. Every release also has the same files with the version in the name.
 
 > The builds are not code-signed yet.
 > **Windows:** SmartScreen may ask once: choose **More info > Run anyway**.

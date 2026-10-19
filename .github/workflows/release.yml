@@ -84,6 +84,22 @@ jobs:
     needs: [draft, build]
     runs-on: ubuntu-latest
     steps:
+      - name: Installers under fixed names
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          # The website links to releases/latest/download/<fixed name>, which always serves the newest
+          # version: copy every versioned installer to a name without the version.
+          version="${TAG#v}"
+          mkdir stable && cd stable
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "Glint_${version}_*"
+          for file in Glint_"${version}"_*; do
+            case "$file" in *.sig) continue ;; esac
+            mv "$file" "${file/_${version}_/_}"
+          done
+          ls -l
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber Glint_*
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
