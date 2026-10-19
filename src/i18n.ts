@@ -100,6 +100,13 @@ const en = {
   'code.invalid': 'Not valid SVG yet: {message}',
   'code.draftKept': 'Your changes to {name} are kept until Glint closes',
 
+  'warn.chip': '{actual} saved as {extension}',
+  'warn.chipNoExtension': '{actual} without image extension',
+  'warn.tip': 'The file extension does not match the content. Click for details.',
+  'warn.title': 'Wrong file extension',
+  'warn.text': 'This file is a {actual} image, but its name ends in {extension}. Glint shows it anyway; other apps and websites may refuse it. Renaming it to {suggested} fixes that.',
+  'warn.textNoExtension': 'This file is a {actual} image, but its name has no matching extension. Glint shows it anyway; other apps may not open it. Adding {suggested} to the name fixes that.',
+
   'palette.empty': 'No colors to read',
   'palette.copy': 'Copy {hex}',
   'sheet.one': '1 image',
@@ -262,6 +269,13 @@ const de: Record<Key, string> = {
   'code.saveFailed': 'Speichern fehlgeschlagen: {message}',
   'code.invalid': 'Noch kein gültiges SVG: {message}',
   'code.draftKept': 'Deine Änderungen an {name} bleiben erhalten, bis Glint geschlossen wird',
+
+  'warn.chip': '{actual}, gespeichert als {extension}',
+  'warn.chipNoExtension': '{actual} ohne Bild-Endung',
+  'warn.tip': 'Die Dateiendung passt nicht zum Inhalt. Klicken für Details.',
+  'warn.title': 'Falsche Dateiendung',
+  'warn.text': 'Diese Datei ist ein {actual}-Bild, ihr Name endet aber auf {extension}. Glint zeigt sie trotzdem an, andere Programme und Websites lehnen sie womöglich ab. Umbenennen in {suggested} behebt das.',
+  'warn.textNoExtension': 'Diese Datei ist ein {actual}-Bild, ihr Name hat aber keine passende Endung. Glint zeigt sie trotzdem an, andere Programme öffnen sie womöglich nicht. Die Endung {suggested} anhängen behebt das.',
 
   'palette.empty': 'Keine Farben lesbar',
   'palette.copy': '{hex} kopieren',

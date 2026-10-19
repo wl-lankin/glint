@@ -6,6 +6,9 @@ export interface FileInfo {
   size: number;
   modified: number | null;
   format: string | null;
+  /** Format by the first bytes and by the extension; they differ for a PNG saved as .jpg. */
+  content_format: string | null;
+  extension_format: string | null;
   exif: [string, string][];
 }
 

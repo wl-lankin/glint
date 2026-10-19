@@ -7,7 +7,7 @@ import { backdropNeed } from './palette';
 import { Panels } from './panels';
 import { loadSettings, saveSettings, type Settings } from './settings';
 import { Slideshow } from './slideshow';
-import { baseName, extension, formatLabel } from './util';
+import { baseName, extension, extensionMismatch, formatLabel } from './util';
 import { canPan, clampPan, fitView, nextStop, zoomAt, type Size, type View } from './view';
 
 interface Slot {
@@ -214,6 +214,12 @@ export class App {
       .then((info) => {
         if (token !== this.loadToken) return;
         this.info = info;
+        // The extension guessed "opaque JPEG"; the content may say otherwise (a PNG named .jpg).
+        const img = this.slot.img;
+        if (img.classList.contains('is-opaque') && info.content_format && info.content_format !== 'jpeg') {
+          img.classList.remove('is-opaque');
+          this.analyzeBackdrop(img);
+        }
         this.renderMeta();
         this.panels.refresh();
       })
@@ -480,6 +486,15 @@ export class App {
     if (!this.broken && this.natural.w > 1) parts.push(`${this.natural.w} × ${this.natural.h}`);
     parts.push(formatLabel(this.info?.format, path));
     meta.textContent = parts.join('  ·  ');
+    const chip = this.root.querySelector<HTMLElement>('.warn-chip')!;
+    const mismatch = this.broken ? null : extensionMismatch(this.info, path);
+    chip.hidden = !mismatch;
+    if (mismatch) {
+      chip.textContent = mismatch.extension
+        ? t('warn.chip', { actual: mismatch.actual, extension: mismatch.extension })
+        : t('warn.chipNoExtension', { actual: mismatch.actual });
+      chip.dataset.tip = t('warn.tip');
+    }
     this.root.classList.toggle('has-many', this.items.length > 1);
     this.root.classList.toggle('is-set', this.source === 'set');
     this.root.classList.toggle('is-svg', this.isSvg(path));

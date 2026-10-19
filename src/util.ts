@@ -71,3 +71,32 @@ export function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = ''
 export function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 }
+
+const CANONICAL_EXTENSION: Record<string, string> = {
+  png: 'png', jpeg: 'jpg', gif: 'gif', webp: 'webp', avif: 'avif', heic: 'heic', svg: 'svg', bmp: 'bmp',
+  ico: 'ico', tiff: 'tif', tga: 'tga', qoi: 'qoi', dds: 'dds', hdr: 'hdr', exr: 'exr', pnm: 'ppm',
+  farbfeld: 'ff', jxl: 'jxl', psd: 'psd',
+};
+
+export interface ExtensionMismatch {
+  /** Label of the real format, e.g. "PNG". */
+  actual: string;
+  /** The extension the file has, with dot, or '' when it has none. */
+  extension: string;
+  /** The extension that fits the content, with dot. */
+  suggested: string;
+}
+
+/** The file's content is a different image format than its name says (or the name says none). */
+export function extensionMismatch(
+  info: { content_format: string | null; extension_format: string | null } | null,
+  path: string,
+): ExtensionMismatch | null {
+  if (!info?.content_format || info.content_format === info.extension_format) return null;
+  const ext = extension(path);
+  return {
+    actual: formatLabel(info.content_format, path),
+    extension: ext ? `.${ext}` : '',
+    suggested: `.${CANONICAL_EXTENSION[info.content_format] ?? info.content_format}`,
+  };
+}

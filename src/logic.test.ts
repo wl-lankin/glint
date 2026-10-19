@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { backdropNeed, extractPalette, inkFor, toHex } from './palette';
 import { sanitize, DEFAULTS } from './settings';
 import { Slideshow } from './slideshow';
-import { baseName, compareVersions, dirName, extension, formatBytes, formatLabel } from './util';
+import { baseName, compareVersions, dirName, extension, extensionMismatch, formatBytes, formatLabel } from './util';
 
 describe('Slideshow', () => {
   it('advances once per interval and waits for the next image', () => {
@@ -131,5 +131,24 @@ describe('backdropNeed', () => {
     expect(backdropNeed(image([255, 106, 166, 255], [0, 0, 0, 0], 0.4))).toBeNull();
     expect(backdropNeed(image([0, 0, 0, 255], [0, 0, 0, 255], 1))).toBeNull();
     expect(backdropNeed(new Uint8ClampedArray(400))).toBeNull();
+  });
+});
+
+describe('extensionMismatch', () => {
+  const info = (content: string | null, ext: string | null) => ({ content_format: content, extension_format: ext });
+
+  it('spots a PNG saved as .jpg', () => {
+    expect(extensionMismatch(info('png', 'jpeg'), '/x/photo.JPG')).toEqual({ actual: 'PNG', extension: '.jpg', suggested: '.png' });
+  });
+
+  it('spots an image without an image extension', () => {
+    expect(extensionMismatch(info('jpeg', null), '/x/photo.download')).toEqual({ actual: 'JPEG', extension: '.download', suggested: '.jpg' });
+    expect(extensionMismatch(info('webp', null), '/x/photo')).toEqual({ actual: 'WebP', extension: '', suggested: '.webp' });
+  });
+
+  it('stays quiet when content and name agree or the content is unknown', () => {
+    expect(extensionMismatch(info('jpeg', 'jpeg'), '/x/a.jpeg')).toBeNull();
+    expect(extensionMismatch(info(null, 'tga'), '/x/a.tga')).toBeNull();
+    expect(extensionMismatch(null, '/x/a.png')).toBeNull();
   });
 });

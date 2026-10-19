@@ -3,7 +3,7 @@ import { icons } from './icons';
 import { t, type Key } from './i18n';
 import { extractPalette, inkFor, toHex } from './palette';
 import type { Settings } from './settings';
-import { baseName, dirName, el, extension, formatBytes, formatDate, formatLabel, megapixels } from './util';
+import { baseName, dirName, el, extension, extensionMismatch, formatBytes, formatDate, formatLabel, megapixels } from './util';
 
 import logoUrl from '../assets/logo.svg';
 
@@ -196,7 +196,21 @@ export class Panels {
       return section;
     };
 
-    const parts: HTMLElement[] = [head, table(rows)];
+    const parts: HTMLElement[] = [head];
+    const mismatch = app.broken ? null : extensionMismatch(info, path);
+    if (mismatch) {
+      const box = el('section', 'warn-box');
+      box.setAttribute('role', 'alert');
+      const title = el('strong');
+      title.textContent = t('warn.title');
+      const text = el('p');
+      text.textContent = mismatch.extension
+        ? t('warn.text', { actual: mismatch.actual, extension: mismatch.extension, suggested: mismatch.suggested })
+        : t('warn.textNoExtension', { actual: mismatch.actual, suggested: mismatch.suggested });
+      box.append(title, text);
+      parts.push(box);
+    }
+    parts.push(table(rows));
     const histogram = this.histogram();
     if (histogram) {
       const section = el('section', 'kv');

@@ -3,7 +3,7 @@
 // the empty start screen.
 import { detectPlatform, idleUpdates, type Backend, type FileInfo } from './backend';
 
-const DEMO = ['atom.svg', 'aurora.jpg', 'canyon.jpg', 'coast.jpg', 'forest.jpg', 'city.jpg', 'peaks.jpg', 'glint.svg', 'alpha.png'];
+const DEMO = ['atom.svg', 'aurora.jpg', 'canyon.jpg', 'coast.jpg', 'forest.jpg', 'city.jpg', 'peaks.jpg', 'glint.svg', 'alpha.png', 'mislabeled.jpg'];
 const demoPath = (name: string) => `/demo/${name}`;
 
 export function createMockBackend(): Backend {
@@ -47,7 +47,9 @@ export function createMockBackend(): Backend {
           ? [['Camera', 'FUJIFILM X-T5'], ['Lens', 'XF23mmF1.4 R LM WR'], ['Aperture', 'f/2.8'], ['Exposure', '1/250 s'], ['ISO', '160'], ['Focal length', '23 mm'], ['Taken', '2026-09-14 18:42:07']]
           : [];
       const size = (await fetch(path.split('#')[0]).then((r) => r.blob()).catch(() => null))?.size ?? 0;
-      return { size, modified: Date.now() - 86_400_000 * 3, format, exif };
+      // demo/mislabeled.jpg is a PNG with the wrong extension.
+      const content = path.includes('mislabeled') ? 'png' : format;
+      return { size, modified: Date.now() - 86_400_000 * 3, format: content, content_format: content, extension_format: format, exif };
     },
     url: (path) => path,
     async extensions() {

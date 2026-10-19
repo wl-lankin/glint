@@ -64,6 +64,10 @@ pub struct FileInfo {
     size: u64,
     modified: Option<u64>,
     format: Option<Format>,
+    /// What the first bytes say, and what the extension claims. They differ for a PNG saved as
+    /// .jpg; the frontend warns about that.
+    content_format: Option<Format>,
+    extension_format: Option<Format>,
     exif: Vec<(String, String)>,
 }
 
@@ -75,7 +79,14 @@ pub fn file_info(path: String) -> Result<FileInfo, String> {
     let mut head = vec![0u8; 4096];
     let n = File::open(&path).and_then(|mut f| f.read(&mut head)).unwrap_or(0);
     head.truncate(n);
-    Ok(FileInfo { size: meta.len(), modified, format: formats::detect(&path, &head), exif: read_exif(&path) })
+    Ok(FileInfo {
+        size: meta.len(),
+        modified,
+        format: formats::detect(&path, &head),
+        content_format: formats::sniff(&head),
+        extension_format: formats::from_extension(&path),
+        exif: read_exif(&path),
+    })
 }
 
 fn read_exif(path: &Path) -> Vec<(String, String)> {
@@ -216,7 +227,20 @@ mod tests {
         let info = file_info(file.to_string_lossy().into_owned()).unwrap();
         assert_eq!(info.size, 41);
         assert_eq!(info.format, Some(Format::Svg));
+        assert_eq!(info.content_format, Some(Format::Svg));
+        assert_eq!(info.extension_format, Some(Format::Svg));
         assert!(info.modified.is_some());
         assert!(info.exif.is_empty());
+    }
+
+    #[test]
+    fn file_info_reports_a_wrong_extension() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("photo.jpg");
+        std::fs::write(&file, b"\x89PNG\r\n\x1a\nrest").unwrap();
+        let info = file_info(file.to_string_lossy().into_owned()).unwrap();
+        assert_eq!(info.content_format, Some(Format::Png));
+        assert_eq!(info.extension_format, Some(Format::Jpeg));
+        assert_eq!(info.format, Some(Format::Png));
     }
 }
