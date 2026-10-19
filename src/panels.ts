@@ -516,7 +516,7 @@ export class Panels {
     const groups: [Key, [string[], Key][]][] = [
       ['help.browse', [[['←', '→'], 'help.prevNext'], [['Home', 'End'], 'help.firstLast'], [[t('key.space')], 'help.play'], [['G'], 'help.sheet'], [['O'], 'help.open']]],
       ['help.view', [[[t('key.wheel')], 'help.wheel'], [['0'], 'help.fit'], [['1'], 'help.actual'], [['+', '−'], 'help.zoom'], [[t('key.dblclick')], 'help.dblclick'], [['R', 'Shift R'], 'help.rotate'], [['F'], 'help.mirror'], [['Enter'], 'help.fullscreen']]],
-      ['help.closer', [[['I'], 'help.info'], [['P'], 'help.palette'], [['L', t('key.holdAlt')], 'help.loupe'], [['A'], 'help.ambient'], [['B'], 'help.backdrop'], [[`${mod} C`], 'help.copy']]],
+      ['help.closer', [[['I'], 'help.info'], [['P'], 'help.palette'], [['L', t('key.holdAlt')], 'help.loupe'], [['A'], 'help.ambient'], [['B'], 'help.backdrop'], [[`${mod} C`], 'help.copy'], [['E'], 'help.code']]],
     ];
     const body = el('div', 'help');
     body.append(el('h2', '', t('help.title')));

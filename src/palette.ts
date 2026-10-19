@@ -90,3 +90,32 @@ export function inkFor(r: number, g: number, b: number): '#000' | '#fff' {
   const l = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
   return l > 0.36 ? '#000' : '#fff';
 }
+
+/**
+ * Whether a transparent image needs a contrasting card behind it: 'light' when its visible pixels
+ * are dark (a black SVG on a dark window), 'dark' when they are light, null for opaque images and
+ * for content that reads on either background.
+ */
+export function backdropNeed(rgba: Uint8ClampedArray): 'light' | 'dark' | null {
+  let total = 0;
+  let transparent = 0;
+  let weight = 0;
+  let luminance = 0;
+  for (let i = 0; i < rgba.length; i += 4) {
+    total++;
+    const a = rgba[i + 3] / 255;
+    if (a < 0.98) transparent++;
+    if (a < 0.12) continue;
+    const lin = (v: number) => {
+      const s = v / 255;
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    luminance += a * (0.2126 * lin(rgba[i]) + 0.7152 * lin(rgba[i + 1]) + 0.0722 * lin(rgba[i + 2]));
+    weight += a;
+  }
+  if (total === 0 || weight === 0 || transparent / total < 0.02) return null;
+  const mean = luminance / weight;
+  if (mean < 0.06) return 'light';
+  if (mean > 0.6) return 'dark';
+  return null;
+}

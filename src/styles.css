@@ -1752,6 +1752,180 @@ kbd {
   opacity: 1;
 }
 
+/* ------------------------------------------------------------------ contrast card
+   A transparent image whose content would vanish (black on dark, white on light) sits on a soft
+   card in the opposite tone. The spread shadow works as padding around the image box. */
+
+.app[data-theme="dark"][data-backdrop="auto"] .pic[data-need="light"] {
+  background: #eef0f5;
+  border-radius: 10px;
+  box-shadow: 0 0 0 22px #eef0f5, 0 30px 80px 4px rgba(0, 0, 0, 0.55);
+}
+
+.app[data-theme="light"][data-backdrop="auto"] .pic[data-need="dark"] {
+  background: #1a1d27;
+  border-radius: 10px;
+  box-shadow: 0 0 0 22px #1a1d27, 0 30px 70px 0 rgba(20, 24, 40, 0.35);
+}
+
+/* ------------------------------------------------------------------ SVG source editor */
+
+.app[data-theme="dark"] {
+  --syn-tag: #ff8fbe;
+  --syn-attr: #a9a1ff;
+  --syn-value: #ffd37a;
+}
+
+.app[data-theme="light"] {
+  --syn-tag: #c2185b;
+  --syn-attr: #5b4bdb;
+  --syn-value: #a35f00;
+}
+
+.app {
+  --editor-w: min(560px, 46vw);
+}
+
+.code-btn {
+  display: none;
+}
+
+.is-svg .code-btn {
+  display: grid;
+}
+
+.editor-open .code-btn {
+  color: var(--text);
+  background: var(--hover);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.code-panel {
+  position: absolute;
+  top: 56px;
+  right: 12px;
+  bottom: 12px;
+  width: calc(var(--editor-w) - 24px);
+  z-index: 32;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: var(--glass-strong);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(30px) saturate(1.6);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(20px);
+  transition: opacity 240ms ease, transform 320ms var(--ease-out);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.editor-open .code-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+.editor-open .stage {
+  right: var(--editor-w);
+  transition: right 320ms var(--ease-out);
+}
+
+.editor-open .dock {
+  left: calc((100% - var(--editor-w)) / 2);
+}
+
+.editor-open .info-panel {
+  display: none;
+}
+
+.code-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 10px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.code-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.code-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.code-file {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.code-status {
+  font-size: 11.5px;
+  color: #ffd37a;
+  white-space: nowrap;
+}
+
+.code-revert {
+  display: none;
+}
+
+.is-dirty .code-revert {
+  display: inline-flex;
+}
+
+.code-save {
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--muted);
+  background: var(--hover);
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.is-dirty .code-save {
+  color: #11131b;
+  background: var(--spectrum);
+}
+
+.code-host {
+  flex: 1;
+  min-height: 0;
+}
+
+.code-error {
+  padding: 9px 16px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #ffb3c1;
+  background: rgba(255, 92, 120, 0.12);
+  border-top: 1px solid rgba(255, 92, 120, 0.3);
+}
+
+.app[data-theme="light"] .code-error {
+  color: #b0203f;
+}
+
+.code-error[hidden] {
+  display: none;
+}
+
 /* ------------------------------------------------------------------ reduced motion
    Large motion stops; short feedback fades stay, so hovers do not snap. */
 

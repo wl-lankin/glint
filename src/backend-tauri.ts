@@ -13,6 +13,7 @@ export function createTauriBackend(): Backend {
   // Part of every image URL: a file opened again later is read fresh instead of from the cache.
   const stamp = Date.now().toString(36);
   let extensions: Promise<string[]> | null = null;
+  const revisions = new Map<string, number>();
 
   return {
     platform: detectPlatform(),
@@ -30,7 +31,8 @@ export function createTauriBackend(): Backend {
     },
     siblings: (path) => invoke<string[]>('siblings', { path }),
     info: (path) => invoke<FileInfo>('file_info', { path }),
-    url: (path, thumb) => `${convertFileSrc(path, 'glint')}?v=${stamp}${thumb ? '&thumb' : ''}`,
+    url: (path, thumb) => `${convertFileSrc(path, 'glint')}?v=${stamp}.${revisions.get(path) ?? 0}${thumb ? '&thumb' : ''}`,
+    invalidate: (path) => void revisions.set(path, (revisions.get(path) ?? 0) + 1),
     extensions() {
       extensions ??= invoke<string[]>('extensions');
       return extensions;
@@ -42,6 +44,7 @@ export function createTauriBackend(): Backend {
     },
     reveal: (path) => revealItemInDir(path),
     copyPng: (png) => invoke('copy_image', png),
+    saveSvg: (path, contents) => invoke('save_svg', { path, contents }),
     copyText: (text) => navigator.clipboard.writeText(text),
     openUrl: (url) => openUrl(url),
     setTitle: (title) => void win.setTitle(title),

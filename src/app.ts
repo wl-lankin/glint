@@ -1,7 +1,9 @@
 import type { Backend, FileInfo } from './backend';
 import { icons } from './icons';
 import { detectLanguage, setLanguage, t, translateDom } from './i18n';
+import type { SvgEditor } from './editor';
 import { Loupe } from './loupe';
+import { backdropNeed } from './palette';
 import { Panels } from './panels';
 import { loadSettings, saveSettings, type Settings } from './settings';
 import { Slideshow } from './slideshow';
@@ -44,6 +46,9 @@ export class App {
   private hudPinned = false;
   private fullscreen = false;
   private lang = '';
+  private editor: SvgEditor | null = null;
+  /** Object URL of the live SVG preview on the current slide, revoked when replaced. */
+  private previewUrl = '';
 
   constructor(readonly backend: Backend) {
     this.slots = [...this.stage.querySelectorAll<HTMLElement>('.slide')].map((slide) => ({
@@ -175,7 +180,8 @@ export class App {
     const ext = extension(path);
     img.classList.toggle('is-opaque', OPAQUE.has(ext));
     img.classList.toggle('is-vector', VECTOR.has(ext));
-    this.view = fitView(this.natural, this.stageSize(), 0, false, this.upscales());
+    this.analyzeBackdrop(img);
+    this.view = fitView(this.natural, this.fitPort(img), 0, false, this.upscales());
     this.applyView(next, false);
 
     const from = this.slots[this.active];
@@ -195,6 +201,11 @@ export class App {
 
   private afterShow(path: string, token: number) {
     this.slideshow.restart();
+    this.dropPreview();
+    if (this.root.classList.contains('editor-open')) {
+      if (this.isSvg(path)) void this.editor?.load(path);
+      else this.toggleEditor(false);
+    }
     this.renderMeta();
     this.backend.setTitle(`${baseName(path)} - Glint`);
     this.preload();
@@ -208,6 +219,99 @@ export class App {
       })
       .catch(() => {});
     this.panels.refresh();
+  }
+
+  isSvg(path = this.current): boolean {
+    return path !== undefined && VECTOR.has(extension(path));
+  }
+
+  /** Measures a transparent image and asks for a contrasting card when it would vanish. */
+  private analyzeBackdrop(img: HTMLImageElement) {
+    img.dataset.need = '';
+    if (img.classList.contains('is-opaque')) return;
+    const w = img.naturalWidth || 1000;
+    const h = img.naturalHeight || 1000;
+    const k = 64 / Math.max(w, h);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(w * k));
+    canvas.height = Math.max(1, Math.round(h * k));
+    try {
+      const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.dataset.need = backdropNeed(ctx.getImageData(0, 0, canvas.width, canvas.height).data) ?? '';
+    } catch {
+      // A tainted or undecodable image keeps the plain backdrop.
+    }
+  }
+
+  // ---------------------------------------------------------------- SVG source editor
+
+  async toggleEditor(force?: boolean) {
+    const open = force ?? !this.root.classList.contains('editor-open');
+    if (!open) {
+      if (!this.root.classList.contains('editor-open')) return;
+      this.editor?.stash();
+      this.root.classList.remove('editor-open');
+      this.restoreCurrent();
+      return;
+    }
+    const path = this.current;
+    if (!path || !this.isSvg(path)) return;
+    if (!this.editor) {
+      const { SvgEditor } = await import('./editor');
+      this.editor = new SvgEditor(this);
+    }
+    this.slideshow.pause();
+    this.root.classList.remove('info-open');
+    this.root.classList.add('editor-open');
+    await this.editor.load(path);
+    this.editor.focus();
+  }
+
+  /** Shows edited SVG source on the current slide without a transition. */
+  async previewSvg(text: string) {
+    const img = this.slot.img;
+    const url = URL.createObjectURL(new Blob([text], { type: 'image/svg+xml' }));
+    img.src = url;
+    try {
+      await img.decode();
+    } catch {
+      URL.revokeObjectURL(url);
+      return;
+    }
+    if (this.previewUrl) URL.revokeObjectURL(this.previewUrl);
+    this.previewUrl = url;
+    this.broken = false;
+    this.root.classList.remove('is-broken');
+    this.panels.hideBroken();
+    const natural = { w: img.naturalWidth || 1000, h: img.naturalHeight || 1000 };
+    const resized = natural.w !== this.natural.w || natural.h !== this.natural.h;
+    this.natural = natural;
+    if (resized && this.view.mode === 'fit') this.fit(false);
+    else this.applyView();
+    this.analyzeBackdrop(img);
+    this.renderMeta();
+  }
+
+  /** Back from a live preview to the file as it is on disk. */
+  private restoreCurrent() {
+    if (!this.previewUrl || !this.current) return;
+    this.dropPreview();
+    const img = this.slot.img;
+    img.src = this.backend.url(this.current);
+    void img.decode().then(() => {
+      this.natural = { w: img.naturalWidth || 1000, h: img.naturalHeight || 1000 };
+      if (this.view.mode === 'fit') this.fit(false);
+      else this.applyView();
+      this.analyzeBackdrop(img);
+      this.renderMeta();
+    }, () => {});
+  }
+
+  private dropPreview() {
+    if (!this.previewUrl) return;
+    URL.revokeObjectURL(this.previewUrl);
+    this.previewUrl = '';
   }
 
   private preload() {
@@ -236,6 +340,15 @@ export class App {
     return { w: this.stage.clientWidth, h: this.stage.clientHeight };
   }
 
+  /** The area an image fits into: the stage, less the padding of a contrast card around it. */
+  private fitPort(img = this.slot.img): Size {
+    const size = this.stageSize();
+    const need = img.dataset.need;
+    const theme = this.root.dataset.theme;
+    const card = this.settings.backdrop === 'auto' && ((need === 'light' && theme === 'dark') || (need === 'dark' && theme === 'light'));
+    return card ? { w: size.w - 44, h: size.h - 44 } : size;
+  }
+
   applyView(slot = this.slot, animate = false) {
     const { img } = slot;
     const v = this.view;
@@ -260,7 +373,7 @@ export class App {
   }
 
   fit(animate = true) {
-    this.setView(fitView(this.natural, this.stageSize(), this.view.rotation, this.view.flip, this.upscales()), animate);
+    this.setView(fitView(this.natural, this.fitPort(), this.view.rotation, this.view.flip, this.upscales()), animate);
     this.restartKenBurns();
   }
 
@@ -275,7 +388,7 @@ export class App {
 
   rotate(by: 90 | -90) {
     const rotation = ((((this.view.rotation + by) % 360) + 360) % 360) as View['rotation'];
-    if (this.view.mode === 'fit') this.setView(fitView(this.natural, this.stageSize(), rotation, this.view.flip, this.upscales()), true);
+    if (this.view.mode === 'fit') this.setView(fitView(this.natural, this.fitPort(), rotation, this.view.flip, this.upscales()), true);
     else this.setView({ ...this.view, rotation }, true);
   }
 
@@ -285,7 +398,7 @@ export class App {
 
   private onResize() {
     if (this.index < 0 || this.broken) return;
-    if (this.view.mode === 'fit') this.setView(fitView(this.natural, this.stageSize(), this.view.rotation, this.view.flip, this.upscales()));
+    if (this.view.mode === 'fit') this.setView(fitView(this.natural, this.fitPort(), this.view.rotation, this.view.flip, this.upscales()));
     else this.setView(this.view);
   }
 
@@ -332,6 +445,7 @@ export class App {
       this.renderMeta();
       this.renderUpdatePill();
       this.panels.relocalize();
+      this.editor?.relocalize();
     }
     const dark = s.theme === 'dark' || (s.theme === 'system' && !matchMedia('(prefers-color-scheme: light)').matches);
     this.root.dataset.theme = dark ? 'dark' : 'light';
@@ -368,6 +482,7 @@ export class App {
     meta.textContent = parts.join('  ·  ');
     this.root.classList.toggle('has-many', this.items.length > 1);
     this.root.classList.toggle('is-set', this.source === 'set');
+    this.root.classList.toggle('is-svg', this.isSvg(path));
   }
 
   private renderUpdatePill() {
@@ -396,6 +511,7 @@ export class App {
       open: icons.open, info: icons.info, palette: icons.palette, grid: icons.grid, ambient: icons.ambient, menu: icons.more,
       prev: icons.prev, next: icons.next, 'zoom-in': icons.zoomIn, 'zoom-out': icons.zoomOut, rotate: icons.rotate,
       flip: icons.flip, backdrop: icons.backdrop, loupe: icons.loupe, fullscreen: icons.fullscreen,
+      code: icons.code,
       'win-min': icons.winMin, 'win-max': icons.winMax, 'win-close': icons.winClose,
     };
     this.root.querySelectorAll<HTMLElement>('.icon-btn[data-action], .win-btn[data-action]').forEach((b) => {
@@ -452,6 +568,7 @@ export class App {
       case 'loupe': return this.loupe.toggle();
       case 'fullscreen': return void this.toggleFullscreen();
       case 'update': return void this.backend.updates.installNow();
+      case 'code': return void this.toggleEditor();
       case 'win-min': return this.backend.minimize();
       case 'win-max': return this.backend.toggleMaximize();
       case 'win-close': return this.backend.close();
@@ -566,6 +683,7 @@ export class App {
 
   private bindKeys() {
     window.addEventListener('keydown', (e) => {
+      if ((e.target as HTMLElement | null)?.closest?.('.code-panel')) return;
       if (this.panels.handleKey(e)) return;
       const mod = e.ctrlKey || e.metaKey;
       const k = e.key;
@@ -609,6 +727,7 @@ export class App {
         case 'r': return this.rotate(e.shiftKey ? -90 : 90);
         case 'f': return this.flip();
         case 'l': return this.loupe.toggle();
+        case 'e': return void this.toggleEditor();
         case 's': return this.togglePlay();
       }
     });

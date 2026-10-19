@@ -13,6 +13,7 @@ const en = {
   'start.tip': 'Tip: select several images and open them together for a slideshow.',
 
   'tip.open': 'Open (O)',
+  'tip.code': 'SVG source (E)',
   'tip.info': 'Info (I)',
   'tip.palette': 'Palette (P)',
   'tip.grid': 'Contact sheet (G)',
@@ -90,6 +91,15 @@ const en = {
   'exif.Copyright': 'Copyright',
   'exif.Location': 'Location',
 
+  'code.title': 'SVG source',
+  'code.save': 'Save',
+  'code.revert': 'Revert',
+  'code.unsaved': 'Unsaved changes',
+  'code.saved': 'Saved {name}',
+  'code.saveFailed': 'Could not save: {message}',
+  'code.invalid': 'Not valid SVG yet: {message}',
+  'code.draftKept': 'Your changes to {name} are kept until Glint closes',
+
   'palette.empty': 'No colors to read',
   'palette.copy': 'Copy {hex}',
   'sheet.one': '1 image',
@@ -144,6 +154,7 @@ const en = {
   'help.ambient': 'Ambient light',
   'help.backdrop': 'Backdrop for transparency',
   'help.copy': 'Copy image',
+  'help.code': 'Edit SVG source',
   'key.space': 'Space',
   'key.wheel': 'Wheel',
   'key.dblclick': 'Double-click',
@@ -165,6 +176,7 @@ const de: Record<Key, string> = {
   'start.tip': 'Tipp: Mehrere Bilder markieren und zusammen öffnen ergibt eine Diashow.',
 
   'tip.open': 'Öffnen (O)',
+  'tip.code': 'SVG-Quelltext (E)',
   'tip.info': 'Info (I)',
   'tip.palette': 'Farbpalette (P)',
   'tip.grid': 'Kontaktabzug (G)',
@@ -242,6 +254,15 @@ const de: Record<Key, string> = {
   'exif.Copyright': 'Copyright',
   'exif.Location': 'Ort',
 
+  'code.title': 'SVG-Quelltext',
+  'code.save': 'Speichern',
+  'code.revert': 'Verwerfen',
+  'code.unsaved': 'Ungespeicherte Änderungen',
+  'code.saved': '{name} gespeichert',
+  'code.saveFailed': 'Speichern fehlgeschlagen: {message}',
+  'code.invalid': 'Noch kein gültiges SVG: {message}',
+  'code.draftKept': 'Deine Änderungen an {name} bleiben erhalten, bis Glint geschlossen wird',
+
   'palette.empty': 'Keine Farben lesbar',
   'palette.copy': '{hex} kopieren',
   'sheet.one': '1 Bild',
@@ -296,6 +317,7 @@ const de: Record<Key, string> = {
   'help.ambient': 'Umgebungslicht',
   'help.backdrop': 'Hintergrund für Transparenz',
   'help.copy': 'Bild kopieren',
+  'help.code': 'SVG-Quelltext bearbeiten',
   'key.space': 'Leertaste',
   'key.wheel': 'Mausrad',
   'key.dblclick': 'Doppelklick',

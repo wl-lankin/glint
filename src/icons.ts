@@ -9,6 +9,7 @@ export const icons = {
   grid: svg('<rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>'),
   ambient: svg('<circle cx="12" cy="12" r="4"/><path d="M12 3v1.8M12 19.2V21M3 12h1.8M19.2 12H21M5.6 5.6l1.3 1.3M17.1 17.1l1.3 1.3M5.6 18.4l1.3-1.3M17.1 6.9l1.3-1.3"/>'),
   image: svg('<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="15.5" cy="9.5" r="1.6"/><path d="m3.8 16.5 4.7-4.7a1.2 1.2 0 0 1 1.7 0l3.3 3.3 1.8-1.8a1.2 1.2 0 0 1 1.7 0l3.2 3.2"/>'),
+  code: svg('<path d="m8.5 7.5-4.5 4.5 4.5 4.5M15.5 7.5l4.5 4.5-4.5 4.5M13.5 5l-3 14"/>'),
   more: svg('<circle cx="5.5" cy="12" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="18.5" cy="12" r="1.2" fill="currentColor"/>'),
   prev: svg('<path d="m14.5 6-6 6 6 6"/>'),
   next: svg('<path d="m9.5 6 6 6-6 6"/>'),

@@ -130,6 +130,29 @@ fn gps(exif: &exif::Exif) -> Option<String> {
     Some(format!("{lat:.5}, {lon:.5}"))
 }
 
+/// Writes edited SVG source back to its file. Only existing .svg files are written, through a
+/// temporary file next to it, so a failed write never leaves half a file behind.
+#[tauri::command(async)]
+pub fn save_svg(path: String, contents: String) -> Result<(), String> {
+    write_svg(Path::new(&path), &contents)
+}
+
+fn write_svg(path: &Path, contents: &str) -> Result<(), String> {
+    if formats::from_extension(path) != Some(Format::Svg) {
+        return Err("only .svg files can be saved".into());
+    }
+    if !path.is_file() {
+        return Err("the file no longer exists".into());
+    }
+    let name = path.file_name().ok_or("no file name")?.to_string_lossy();
+    let temp = path.with_file_name(format!(".{name}.glint-save"));
+    std::fs::write(&temp, contents.as_bytes()).map_err(|e| e.to_string())?;
+    std::fs::rename(&temp, path).map_err(|e| {
+        let _ = std::fs::remove_file(&temp);
+        e.to_string()
+    })
+}
+
 /// Puts the PNG the frontend rendered from the current view on the clipboard.
 #[tauri::command]
 pub fn copy_image(request: Request<'_>) -> Result<(), String> {
@@ -166,6 +189,23 @@ mod tests {
         let list = siblings(odd.to_string_lossy().into_owned());
         assert_eq!(list.len(), 2);
         assert_eq!(PathBuf::from(&list[0]), odd);
+    }
+
+    #[test]
+    fn saves_svg_files_only() {
+        let dir = tempfile::tempdir().unwrap();
+        let svg = dir.path().join("icon.SVG");
+        std::fs::write(&svg, "<svg/>").unwrap();
+        write_svg(&svg, "<svg viewBox='0 0 1 1'/>").unwrap();
+        assert_eq!(std::fs::read_to_string(&svg).unwrap(), "<svg viewBox='0 0 1 1'/>");
+        assert_eq!(std::fs::read_dir(dir.path()).unwrap().count(), 1, "no temp file left");
+
+        let png = dir.path().join("a.png");
+        std::fs::write(&png, "x").unwrap();
+        assert!(write_svg(&png, "<svg/>").is_err());
+        assert_eq!(std::fs::read_to_string(&png).unwrap(), "x");
+        assert!(write_svg(&dir.path().join("gone.svg"), "<svg/>").is_err());
+        assert!(!dir.path().join("gone.svg").exists());
     }
 
     #[test]

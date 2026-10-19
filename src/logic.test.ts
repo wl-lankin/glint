@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { extractPalette, inkFor, toHex } from './palette';
+import { backdropNeed, extractPalette, inkFor, toHex } from './palette';
 import { sanitize, DEFAULTS } from './settings';
 import { Slideshow } from './slideshow';
 import { baseName, compareVersions, dirName, extension, formatBytes, formatLabel } from './util';
@@ -108,5 +108,28 @@ describe('util', () => {
     expect(compareVersions('v1.10.0', '1.9.3')).toBeGreaterThan(0);
     expect(compareVersions('v1.0.0', '1.0.0')).toBe(0);
     expect(compareVersions('1.0.0', '1.0.1')).toBeLessThan(0);
+  });
+});
+
+describe('backdropNeed', () => {
+  const image = (fill: [number, number, number, number], background: [number, number, number, number], share: number) => {
+    const out: number[] = [];
+    for (let i = 0; i < 100; i++) out.push(...(i < share * 100 ? fill : background));
+    return new Uint8ClampedArray(out);
+  };
+
+  it('asks for a light card behind dark content on transparency', () => {
+    expect(backdropNeed(image([0, 0, 0, 255], [0, 0, 0, 0], 0.3))).toBe('light');
+    expect(backdropNeed(image([30, 32, 40, 255], [0, 0, 0, 0], 0.5))).toBe('light');
+  });
+
+  it('asks for a dark card behind white content', () => {
+    expect(backdropNeed(image([255, 255, 255, 255], [0, 0, 0, 0], 0.4))).toBe('dark');
+  });
+
+  it('leaves colorful and opaque images alone', () => {
+    expect(backdropNeed(image([255, 106, 166, 255], [0, 0, 0, 0], 0.4))).toBeNull();
+    expect(backdropNeed(image([0, 0, 0, 255], [0, 0, 0, 255], 1))).toBeNull();
+    expect(backdropNeed(new Uint8ClampedArray(400))).toBeNull();
   });
 });

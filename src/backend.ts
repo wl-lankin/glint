@@ -38,6 +38,10 @@ export interface Backend {
   openDialog(): Promise<string[]>;
   reveal(path: string): Promise<void>;
   copyPng(png: Uint8Array): Promise<void>;
+  /** Writes edited SVG source back to its file. */
+  saveSvg(path: string, contents: string): Promise<void>;
+  /** Makes the next url() of this file bypass the cache (after it changed on disk). */
+  invalidate(path: string): void;
   copyText(text: string): Promise<void>;
   openUrl(url: string): Promise<void>;
   setTitle(title: string): void;

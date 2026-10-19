@@ -31,6 +31,7 @@ pub fn run() {
             commands::siblings,
             commands::file_info,
             commands::copy_image,
+            commands::save_svg,
         ])
         .setup(|app| {
             let cwd = std::env::current_dir().unwrap_or_default();

@@ -3,7 +3,7 @@
 // the empty start screen.
 import { detectPlatform, idleUpdates, type Backend, type FileInfo } from './backend';
 
-const DEMO = ['aurora.jpg', 'canyon.jpg', 'coast.jpg', 'forest.jpg', 'city.jpg', 'peaks.jpg', 'glint.svg', 'alpha.png'];
+const DEMO = ['atom.svg', 'aurora.jpg', 'canyon.jpg', 'coast.jpg', 'forest.jpg', 'city.jpg', 'peaks.jpg', 'glint.svg', 'alpha.png'];
 const demoPath = (name: string) => `/demo/${name}`;
 
 export function createMockBackend(): Backend {
@@ -62,6 +62,10 @@ export function createMockBackend(): Backend {
     async copyPng(png) {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': new Blob([png as BlobPart], { type: 'image/png' }) })]);
     },
+    async saveSvg(path, contents) {
+      console.info('save', path, contents.length);
+    },
+    invalidate() {},
     copyText: (text) => navigator.clipboard.writeText(text),
     async openUrl(url) {
       window.open(url, '_blank', 'noopener');
