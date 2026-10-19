@@ -88,6 +88,8 @@ describe('util', () => {
     expect(baseName('C:\\Users\\me\\a.b.PNG')).toBe('a.b.PNG');
     expect(dirName('C:\\Users\\me\\a.png')).toBe('C:\\Users\\me');
     expect(baseName('/Users/me/photo.jpg')).toBe('photo.jpg');
+    expect(baseName('blob:http://localhost/1f2e#Mein Foto.png')).toBe('Mein Foto.png');
+    expect(extension('blob:http://localhost/1f2e#Mein Foto.png')).toBe('png');
     expect(extension('/x/Photo.JPEG')).toBe('jpeg');
     expect(extension('/x/.hidden')).toBe('');
   });
