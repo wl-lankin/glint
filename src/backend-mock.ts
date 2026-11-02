@@ -1,10 +1,12 @@
 // Browser stand-in for the Tauri side, used by `npm run dev` without Tauri.
-// ?demo=show opens the demo images as a slideshow, ?demo=single opens one image, nothing opens
-// the empty start screen.
+// ?demo=show opens the demo images as a slideshow, ?demo=photos only the six photos (the website
+// demo), ?demo=single opens one image, nothing opens the empty start screen.
 import { detectPlatform, idleUpdates, type Backend, type FileInfo } from './backend';
 
 const DEMO = ['atom.svg', 'aurora.jpg', 'canyon.jpg', 'coast.jpg', 'forest.jpg', 'city.jpg', 'peaks.jpg', 'glint.svg', 'alpha.png', 'mislabeled.jpg'];
-const demoPath = (name: string) => `/demo/${name}`;
+// Relative to the page in the website build (base './'), so the demo runs from any folder.
+const DEMO_DIR = `${import.meta.env.BASE_URL}demo/`;
+const demoPath = (name: string) => DEMO_DIR + name;
 
 export function createMockBackend(): Backend {
   const params = new URLSearchParams(location.search);
@@ -29,6 +31,7 @@ export function createMockBackend(): Backend {
     platform,
     async ready() {
       if (demo === 'show') return DEMO.slice(0, 6).map(demoPath);
+      if (demo === 'photos') return DEMO.filter((n) => n.endsWith('.jpg') && n !== 'mislabeled.jpg').map(demoPath);
       if (demo === 'single') return [demoPath(params.get('file') ?? 'aurora.jpg')];
       return [];
     },
@@ -37,13 +40,13 @@ export function createMockBackend(): Backend {
       dropListeners.push(cb);
     },
     async siblings(path) {
-      return path.startsWith('/demo/') ? DEMO.map(demoPath) : [path];
+      return path.startsWith(DEMO_DIR) ? DEMO.map(demoPath) : [path];
     },
     async info(path): Promise<FileInfo> {
       const ext = path.split('.').pop()?.toLowerCase() ?? '';
       const format = ext === 'jpg' ? 'jpeg' : ext;
       const exif: [string, string][] =
-        format === 'jpeg'
+        format === 'jpeg' && path.startsWith(DEMO_DIR)
           ? [['Camera', 'FUJIFILM X-T5'], ['Lens', 'XF23mmF1.4 R LM WR'], ['Aperture', 'f/2.8'], ['Exposure', '1/250 s'], ['ISO', '160'], ['Focal length', '23 mm'], ['Taken', '2026-09-14 18:42:07']]
           : [];
       const size = (await fetch(path.split('#')[0]).then((r) => r.blob()).catch(() => null))?.size ?? 0;

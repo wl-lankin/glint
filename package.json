@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "landing": "vite build --config vite.landing.config.ts",
     "check": "tsc --noEmit",
     "test": "vitest run",
     "tauri": "tauri",
