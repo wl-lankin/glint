@@ -2,6 +2,7 @@ name: release
 
 # A tag v<version> builds Glint for Windows (NSIS installer) and macOS (universal .dmg) and
 # publishes them as a GitHub release. The release notes come from docs/releases/<tag>.md.
+# The Windows app and installer are Authenticode-signed (docs/CODE-SIGNING.md).
 
 on:
   push:
@@ -49,6 +50,14 @@ jobs:
             args: '--target universal-apple-darwin --bundles app,dmg'
             targets: 'aarch64-apple-darwin,x86_64-apple-darwin'
     runs-on: ${{ matrix.os }}
+    # The Azure login for signing only trusts jobs in this environment.
+    environment: release
+    permissions:
+      contents: write
+      id-token: write # Windows signing logs in to Azure Artifact Signing through OIDC
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -68,6 +77,14 @@ jobs:
         run: |
           echo "::error::The draft job passed no release id; nothing would be uploaded."
           exit 1
+      # The app and the installer are signed inside tauri build, so the updater .sig files are made
+      # over the signed installer.
+      - name: Prepare code signing (Windows)
+        id: signing
+        if: matrix.os == 'windows-latest'
+        uses: ./.github/actions/windows-signing
+        with:
+          description: Glint
       - uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,7 +93,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           releaseId: ${{ needs.draft.outputs.release_id }}
-          args: ${{ matrix.args }}
+          args: ${{ matrix.args }}${{ steps.signing.outputs.config && format(' --config {0}', steps.signing.outputs.config) || '' }}
           # latest.json is the feed the in-app updater reads (releases/latest/download/latest.json).
           includeUpdaterJson: true
 

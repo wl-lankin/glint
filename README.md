@@ -29,8 +29,7 @@ Get the latest version from the **[Releases page](https://github.com/wl-lankin/g
 
 These links always point to the newest version. Every release also has the same files with the version in the name.
 
-> The builds are not code-signed yet.
-> **Windows:** SmartScreen may ask once: choose **More info > Run anyway**.
+> The Windows installer is code-signed (Wolfgang Linz) from the next release on; while the certificate is still new, SmartScreen may still ask once: choose **More info > Run anyway**. The macOS build is not signed.
 > **macOS:** open Glint with right-click > **Open** the first time, or run `xattr -cr /Applications/Glint.app`.
 
 ## Features
